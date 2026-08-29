@@ -50,7 +50,15 @@ from jose import jwt, JWTError
 # ================================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "rkms_medistock.db")
-DATABASE_URL = f"sqlite:///{DB_PATH}"
+
+# By default, uses a local SQLite file (single-laptop mode).
+# To share one database across multiple laptops on a network, set the
+# RKMS_DATABASE_URL environment variable to a PostgreSQL connection
+# string on the central computer, e.g.:
+#   postgresql://rkms_user:yourpassword@localhost:5432/rkms_medistock
+# Every other laptop then just opens a browser to that computer's IP —
+# they don't need Postgres, Python, or anything else installed.
+DATABASE_URL = os.environ.get("RKMS_DATABASE_URL", f"sqlite:///{DB_PATH}")
 
 SECRET_KEY = os.environ.get("RKMS_SECRET_KEY", "rkms-medistock-change-this-secret-in-production")
 ALGORITHM = "HS256"
@@ -59,7 +67,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 12 * 60  # 12 hours — matches the 30-min idle lo
 # ================================================================
 # 2. DATABASE SETUP
 # ================================================================
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+_engine_kwargs = {"connect_args": {"check_same_thread": False}} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, **_engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -920,6 +929,8 @@ def export_history_csv(db: Session = Depends(get_db), current: User = Depends(ge
 # ================================================================
 @app.get("/backup/download", tags=["Backup"])
 def backup_download(current: User = Depends(require_role("admin"))):
+    if not DATABASE_URL.startswith("sqlite"):
+        raise HTTPException(400, "Whole-file backup only applies to SQLite mode. Use /backup/export-json instead, or back up your PostgreSQL server directly (e.g. pg_dump).")
     if not os.path.exists(DB_PATH):
         raise HTTPException(404, "Database file not found")
     return FileResponse(
@@ -930,6 +941,8 @@ def backup_download(current: User = Depends(require_role("admin"))):
 
 @app.post("/backup/restore", tags=["Backup"])
 def backup_restore(file: UploadFile = File(...), current: User = Depends(require_role("admin"))):
+    if not DATABASE_URL.startswith("sqlite"):
+        raise HTTPException(400, "Whole-file restore only applies to SQLite mode. Restore your PostgreSQL server directly (e.g. pg_restore).")
     if not file.filename.endswith(".db"):
         raise HTTPException(400, "Please upload a .db backup file created by this app")
     global engine, SessionLocal
