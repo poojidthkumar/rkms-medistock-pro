@@ -18,6 +18,9 @@ dependencies = [
     "python-multipart",
 ]
 
+[project.optional-dependencies]
+postgres = ["psycopg2-binary"]
+
 [project.scripts]
 rkms-medistock = "rkms_medistock_pro.cli:main"
 
