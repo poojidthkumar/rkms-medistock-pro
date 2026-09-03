@@ -4700,7 +4700,7 @@ if(document.readyState==='loading'){
 <script>
 (function(){
 
-var API_BASE = 'http://127.0.0.1:8000';
+var API_BASE = (window.location.protocol === 'file:') ? 'http://127.0.0.1:8000' : '';
 var authToken = null;
 
 // ---------- low-level fetch helper ----------
