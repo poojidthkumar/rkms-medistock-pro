@@ -59,6 +59,11 @@ DB_PATH = os.path.join(BASE_DIR, "rkms_medistock.db")
 # Every other laptop then just opens a browser to that computer's IP —
 # they don't need Postgres, Python, or anything else installed.
 DATABASE_URL = os.environ.get("RKMS_DATABASE_URL", f"sqlite:///{DB_PATH}")
+# Force the psycopg2 driver explicitly. Newer SQLAlchemy versions may otherwise
+# default a plain "postgresql://" URL to the psycopg (v3) dialect, which isn't
+# installed here (we install psycopg2-binary via the [postgres] extra).
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 SECRET_KEY = os.environ.get("RKMS_SECRET_KEY", "rkms-medistock-change-this-secret-in-production")
 ALGORITHM = "HS256"
