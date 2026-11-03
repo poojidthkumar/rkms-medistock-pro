@@ -19,6 +19,15 @@
    admin  / admin123
    doctor / doc123
    nurse  / nurse123
+
+ GOOGLE LOGIN (added):
+   POST /auth/google  — "Continue with Google" button.
+   GET  /privacy      — privacy policy page (needed by Google Cloud Branding).
+   Optional environment variables (set them in Render > Environment):
+     GOOGLE_CLIENT_ID       — OAuth Web client ID (default is already set below)
+     GOOGLE_ALLOWED_DOMAINS — e.g. "rkmshome.org"  (empty = ANY Google account)
+     GOOGLE_ADMIN_EMAILS    — e.g. "me@rkmshome.org" (empty = ANY account can pick Admin)
+     RKMS_PRIVACY_CONTACT   — contact email shown on the /privacy page
 ================================================================
 """
 
@@ -27,12 +36,15 @@ import io
 import csv
 import json
 import shutil
+import secrets
+import urllib.parse
+import urllib.request
 from datetime import datetime, timedelta, date
 from typing import Optional, List
 
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
+from fastapi.responses import StreamingResponse, FileResponse, JSONResponse, HTMLResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from sqlalchemy import (
@@ -68,6 +80,17 @@ if DATABASE_URL.startswith("postgresql://"):
 SECRET_KEY = os.environ.get("RKMS_SECRET_KEY", "rkms-medistock-change-this-secret-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 12 * 60  # 12 hours — matches the 30-min idle logout in the frontend session
+
+# ---- Google login settings ----
+GOOGLE_CLIENT_ID = os.environ.get(
+    "GOOGLE_CLIENT_ID",
+    "537417539303-r2oipsrkqcjuggbfgh4launrv0tq8g5r.apps.googleusercontent.com",
+)
+# Empty list = ANY Google account is allowed. Example: GOOGLE_ALLOWED_DOMAINS="rkmshome.org"
+GOOGLE_ALLOWED_DOMAINS = [d.strip().lower() for d in os.environ.get("GOOGLE_ALLOWED_DOMAINS", "").split(",") if d.strip()]
+# Empty list = ANY Google account may choose the Admin role. Example: GOOGLE_ADMIN_EMAILS="a@x.org,b@x.org"
+GOOGLE_ADMIN_EMAILS = [e.strip().lower() for e in os.environ.get("GOOGLE_ADMIN_EMAILS", "").split(",") if e.strip()]
+PRIVACY_CONTACT = os.environ.get("RKMS_PRIVACY_CONTACT", "poojidthkumar.s.2027@rkmshome.org")
 
 # ================================================================
 # 2. DATABASE SETUP
@@ -296,6 +319,11 @@ class Token(BaseModel):
     username: str
 
 
+class GoogleLogin(BaseModel):
+    credential: str                 # the Google ID token from the "Continue with Google" button
+    role: Optional[str] = "nurse"   # admin | doctor | nurse — chosen on the login screen
+
+
 # ================================================================
 # 5. AUTH HELPERS
 # ================================================================
@@ -354,6 +382,34 @@ def require_role(*roles):
     return checker
 
 
+def verify_google_token(credential: str) -> dict:
+    """Verify a Google ID token and return its claims.
+    Uses the official google-auth library when it is installed; otherwise falls back to
+    Google's tokeninfo endpoint (no extra dependency needed)."""
+    try:
+        from google.oauth2 import id_token as _google_id_token
+        from google.auth.transport import requests as _google_requests
+    except ImportError:
+        _google_id_token = None
+
+    if _google_id_token is not None:
+        try:
+            return _google_id_token.verify_oauth2_token(credential, _google_requests.Request(), GOOGLE_CLIENT_ID)
+        except ValueError:
+            raise HTTPException(status_code=401, detail="Invalid Google token")
+
+    try:
+        url = "https://oauth2.googleapis.com/tokeninfo?" + urllib.parse.urlencode({"id_token": credential})
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            info = json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid Google token")
+    if info.get("aud") != GOOGLE_CLIENT_ID or info.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
+        raise HTTPException(status_code=401, detail="Google token is not for this app")
+    info["email_verified"] = str(info.get("email_verified", "")).lower() == "true"
+    return info
+
+
 # ================================================================
 # 6. APP INIT
 # ================================================================
@@ -388,6 +444,53 @@ def health_check():
     return {"status": "ok"}
 
 
+_PRIVACY_HTML = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy - RKMS MediStock Pro</title>
+<style>
+body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto,sans-serif;line-height:1.65}
+main{max-width:760px;margin:0 auto;padding:40px 20px}
+h1{font-size:28px;margin:0 0 4px}h2{font-size:18px;margin:28px 0 6px;color:#93c5fd}
+p,li{color:#cbd5e1}a{color:#93c5fd}.muted{color:#94a3b8;font-size:14px}
+</style></head><body><main>
+<h1>Privacy Policy</h1>
+<p class="muted">RKMS MediStock Pro &middot; Last updated: November 2026</p>
+
+<h2>About this app</h2>
+<p>RKMS MediStock Pro is used by the Ramakrishna Mission Health Center to manage medicine stock,
+dispensing and student health records. It is meant for authorised staff only.</p>
+
+<h2>What we collect</h2>
+<ul>
+<li><b>Google sign-in:</b> when you choose "Continue with Google", we receive your Google email address.
+We use it only to sign you in and to record who performed an action in the activity log.
+We do not receive your Google password.</li>
+<li><b>Health center records:</b> medicine inventory, student details, dispensing and prescription
+records that staff enter into the app.</li>
+</ul>
+
+<h2>How we use it</h2>
+<p>Only to operate the health center's medicine and student-care workflow. We do not sell your data,
+and we do not use it for advertising.</p>
+
+<h2>Sharing</h2>
+<p>Data is not shared with third parties, except where required by law.</p>
+
+<h2>Storage and security</h2>
+<p>Data is stored on the server that runs this application and is available only to signed-in users.
+You can ask us to delete your sign-in record at any time.</p>
+
+<h2>Contact</h2>
+<p>Questions or deletion requests: <a href="mailto:__CONTACT__">__CONTACT__</a></p>
+</main></body></html>"""
+
+
+@app.get("/privacy", include_in_schema=False)
+def privacy_page():
+    return HTMLResponse(_PRIVACY_HTML.replace("__CONTACT__", PRIVACY_CONTACT))
+
+
 def log_action(db: Session, action: str, user: str = "", type_: str = "success"):
     db.add(ActivityLog(user=user, action=action, type=type_))
     db.commit()
@@ -418,6 +521,39 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
         raise HTTPException(status_code=401, detail="Wrong username or password!")
     token = create_access_token({"sub": user.username, "role": user.role})
     log_action(db, f"{user.role} logged in", user.username, "info")
+    return Token(access_token=token, role=user.role, username=user.username)
+
+
+@app.post("/auth/google", response_model=Token, tags=["Auth"])
+def google_login(payload: GoogleLogin, db: Session = Depends(get_db)):
+    """'Continue with Google': verify the Google token, then log the person in
+    with the role they picked on the login screen (admin / doctor / nurse)."""
+    role = (payload.role or "nurse").lower()
+    if role not in ("admin", "doctor", "nurse"):
+        raise HTTPException(status_code=400, detail="Invalid role")
+
+    info = verify_google_token(payload.credential)
+    email = (info.get("email") or "").lower()
+    if not email or not info.get("email_verified"):
+        raise HTTPException(status_code=401, detail="Google email is not verified")
+
+    # Optional restrictions (both are OFF by default = any Google account is allowed)
+    if GOOGLE_ALLOWED_DOMAINS and email.split("@")[-1] not in GOOGLE_ALLOWED_DOMAINS:
+        raise HTTPException(status_code=403, detail="This Google account is not allowed")
+    if role == "admin" and GOOGLE_ADMIN_EMAILS and email not in GOOGLE_ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="This Google account cannot log in as Admin")
+
+    # One user row per (email, role); its password is random, so it can never be used for password login.
+    username = f"{email} ({role})"
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        user = User(username=username, password_hash=hash_password(secrets.token_urlsafe(32)), role=role)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    token = create_access_token({"sub": user.username, "role": user.role})
+    log_action(db, f"{user.role} logged in via Google", user.username, "info")
     return Token(access_token=token, role=user.role, username=user.username)
 
 
