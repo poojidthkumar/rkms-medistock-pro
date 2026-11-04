@@ -800,9 +800,135 @@ code{font-family:'Courier New',monospace;font-size:11.5px;background:var(--surfa
 
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>try{if(localStorage.getItem('rkms_token')){document.documentElement.classList.add('rk-boot');setTimeout(function(){document.documentElement.classList.remove('rk-boot')},8000)}}catch(e){}</script>
+<style id="pharmly-theme">/* ===== PHARMLY THEME (dark green + lime) ===== */
+:root{--pg-dark:#012B24;--pg-dark2:#02382F;--pg-lime:#D4F038;--pg-lime2:#C3E02A;--pg-ink:#0B1F1B}
+body,button,input,select,textarea{font-family:'Plus Jakarta Sans','Inter',system-ui,sans-serif}
+body:not(.dark-mode){background:#F4F7F6}
+body:not(.dark-mode) .sidebar{background:var(--pg-dark);border-right:0;box-shadow:none}
+body:not(.dark-mode) .sidebar *{scrollbar-color:#0f4a3e transparent}
+body:not(.dark-mode) .sidebar .nav-item{color:rgba(255,255,255,.72);border-radius:14px;transition:background .18s,color .18s,transform .18s}
+body:not(.dark-mode) .sidebar .nav-item .material-icons-round{color:rgba(255,255,255,.55)}
+body:not(.dark-mode) .sidebar .nav-item:hover{background:rgba(255,255,255,.08);color:#fff;transform:translateX(3px)}
+body:not(.dark-mode) .sidebar .nav-item.active{background:var(--pg-lime);color:var(--pg-ink);font-weight:700;box-shadow:0 6px 18px rgba(212,240,56,.28)}
+body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(--pg-ink)}
+body:not(.dark-mode) .sidebar-logo{border-bottom:1px solid rgba(255,255,255,.08)}
+body:not(.dark-mode) .topbar{background:rgba(255,255,255,.85);border-bottom:0}
+.mcard,.stat-card{border-radius:22px!important;border:1px solid rgba(1,43,36,.05)!important;box-shadow:0 2px 14px rgba(1,43,36,.05)!important;transition:transform .2s,box-shadow .2s}
+.stat-card:hover,.mcard:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(1,43,36,.10)!important}
+.stat-value{font-weight:800;letter-spacing:-.02em}
+.stat-label{font-size:11.5px;color:var(--text3)}
+body:not(.dark-mode) .stat-card.green{background:var(--pg-dark);color:#fff}
+body:not(.dark-mode) .stat-card.green .stat-label{color:rgba(255,255,255,.65)}
+body:not(.dark-mode) .stat-card.green .stat-icon{color:var(--pg-lime)}
+body:not(.dark-mode) .stat-card.green::before{background:var(--pg-lime)}
+.login-screen{background:linear-gradient(135deg,#0033E6 0%,#0A7BFF 48%,#22CCFF 100%)!important;position:relative;overflow:hidden}
+.login-screen::after{content:'';position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.28) 50%,transparent 62%);animation:pgShine 6s ease-in-out infinite;pointer-events:none}
+@keyframes pgShine{0%{transform:translateX(-55%)}100%{transform:translateX(55%)}}
+.login-card{position:relative;z-index:2}
+.login-logo-wrap{box-shadow:0 0 0 6px rgba(255,255,255,.22),0 12px 30px rgba(0,30,120,.35);background:#fff}
+.login-btn{background:#fff!important;color:#0033E6!important;font-weight:800;border-radius:14px!important;transition:transform .15s,box-shadow .15s}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(0,30,120,.35)}
+.login-card{animation:pgRise .5s cubic-bezier(.16,1,.3,1)}
+.role-tab.active{background:#fff!important;color:#0033E6!important}
+/* boot splash: no login-page flash on refresh when a valid session exists */
+.rk-boot #loginScreen{display:none!important}
+#rk-splash{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#0033E6 0%,#0A7BFF 48%,#22CCFF 100%)}
+.rk-boot #rk-splash{display:flex}
+.rk-ring{width:96px;height:96px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(255,255,255,.6);animation:rkPing 1.4s ease-out infinite}
+.rk-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+@keyframes rkPing{to{box-shadow:0 0 0 28px rgba(255,255,255,0)}}
+/* google account card + topbar chip */
+#g-account-card{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--surface);border-radius:22px;padding:14px 18px;margin-bottom:14px;box-shadow:0 2px 14px rgba(1,43,36,.05);animation:pgRise .5s both}
+.ga-av{width:48px;height:48px;border-radius:50%;object-fit:cover;background:#0A7BFF;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none;position:relative}
+.ga-main{flex:1;min-width:180px}.ga-main b{display:block;font-size:14px}.ga-main small{color:var(--text3);font-size:12px}
+.ga-ok{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#15803D;background:#DCFCE7;border-radius:99px;padding:3px 10px;margin-left:8px;vertical-align:middle}
+.ga-ok i{width:7px;height:7px;border-radius:50%;background:#16A34A;animation:pwPulse 2s infinite}
+.ga-btn{border:1px solid var(--border2);background:var(--surface);color:var(--text);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;transition:transform .15s,background .15s}
+.ga-btn:hover{transform:translateY(-1px);background:var(--surface3)}.ga-btn.pri{background:#0A7BFF;color:#fff;border-color:#0A7BFF}
+#g-chip{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:99px;background:var(--surface3);cursor:pointer;font-size:12px;font-weight:600;max-width:210px;overflow:hidden;white-space:nowrap}
+#g-chip img,#g-chip .ga-av{width:28px;height:28px;font-size:12px;border-radius:50%}
+@keyframes pgSpin{to{transform:rotate(360deg)}}
+@keyframes pgRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+/* dashboard widgets */
+#pharm-widgets{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px}
+@media(max-width:900px){#pharm-widgets{grid-template-columns:1fr}}
+.pw-card{background:var(--surface);border-radius:22px;padding:18px 20px;box-shadow:0 2px 14px rgba(1,43,36,.05);animation:pgRise .5s both}
+.pw-card h3{font-size:15px;font-weight:800;margin:0 0 2px}.pw-card small{color:var(--text3);font-size:11.5px}
+.pw-bars{display:flex;align-items:flex-end;gap:10px;height:190px;margin-top:14px}
+.pw-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;position:relative;background:linear-gradient(var(--surface3),var(--surface3)) center/60% 100% no-repeat;border-radius:99px}
+.pw-bar{width:60%;border-radius:99px;background:var(--pg-dark);transform-origin:bottom;animation:pwGrow .2s ease-out both;min-height:6px}
+.pw-bar.peak{background:repeating-linear-gradient(135deg,var(--pg-dark) 0 6px,var(--pg-lime) 6px 12px)}
+.pw-col span{font-size:10px;color:var(--text3);position:absolute;bottom:-18px}
+.pw-tip{position:absolute;top:-6px;background:var(--pg-dark);color:#fff;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
+@keyframes pwGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.pw-pillars{display:flex;gap:14px;align-items:flex-end;height:210px;margin-top:12px;justify-content:center}
+.pw-pill{width:56px;border-radius:99px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;color:#fff;font-size:11px;font-weight:800;transform-origin:bottom;animation:pwGrow .35s ease-out both}
+.pw-pill-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;font-size:10.5px;color:var(--text2);text-align:center;max-width:70px}
+.pw-wide{grid-column:1/-1}
+.pw-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.pw-table th{font-size:11px;color:var(--text3);text-align:left;padding:8px;font-weight:600}
+.pw-table td{padding:10px 8px;border-top:1px solid var(--border);transition:background .15s}
+.pw-table tr:hover td{background:#F1F5F9}
+.pw-act{display:inline-flex;gap:8px}.pw-act .material-icons-round{font-size:17px;color:var(--text2);cursor:pointer;transition:transform .15s}
+.pw-table tr:hover .pw-act .material-icons-round,.pw-act .material-icons-round:hover{transform:scale(1.1)}
+.pw-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700}
+.pw-chip i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.pw-ok{background:#DCFCE7;color:#15803D}.pw-low{background:#FEF3C7;color:#B45309}.pw-bad{background:#FEE2E2;color:#B91C1C}
+.pw-low i{animation:pwPulse 2s ease-in-out infinite}
+@keyframes pwPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.55)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+.gdrive-banner{border-radius:20px!important;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* ===== Slide-to-confirm ===== */
+.sc-ov{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(1,20,17,.55);backdrop-filter:blur(4px);animation:scFade .15s linear}
+.sc-card{width:min(400px,92vw);background:var(--surface);border-radius:24px;padding:26px 24px 18px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.35);animation:pgRise .2s cubic-bezier(.16,1,.3,1)}
+.sc-ic{width:54px;height:54px;border-radius:50%;margin:0 auto 12px;background:#FEE2E2;color:#DC2626;display:flex;align-items:center;justify-content:center}
+.sc-ic .material-icons-round{font-size:28px}
+.sc-card h3{font-size:17px;font-weight:800;margin:0 0 6px;color:var(--text)}.sc-card p{font-size:13px;color:var(--text2);margin:0 0 18px}
+.sc-track{position:relative;height:54px;border-radius:99px;background:var(--surface3);overflow:hidden;user-select:none;touch-action:none}
+.sc-fill{position:absolute;inset:0 auto 0 0;width:0;background:#DC2626;opacity:.9;border-radius:99px}
+.sc-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.02em;pointer-events:none}
+.sc-knob{position:absolute;top:4px;left:4px;width:46px;height:46px;border-radius:50%;border:0;background:#fff;color:#DC2626;box-shadow:0 3px 10px rgba(0,0,0,.25);cursor:grab;display:flex;align-items:center;justify-content:center;touch-action:none}
+.sc-knob:focus-visible{outline:3px solid var(--pg-lime);outline-offset:2px}
+.sc-back{transition:transform .2s cubic-bezier(.16,1,.3,1),width .2s cubic-bezier(.16,1,.3,1)}
+.sc-cancel{margin-top:12px;background:none;border:0;color:var(--text2);font-weight:700;font-size:13px;padding:8px 14px;border-radius:10px;cursor:pointer}.sc-cancel:hover{background:var(--surface3)}
+.sc-hint{font-size:10.5px;color:var(--text3);margin-top:4px}
+@keyframes scFade{from{opacity:0}to{opacity:1}}
+/* ===== Medicine drawer ===== */
+#med-drawer{position:fixed;top:0;right:0;height:100vh;width:min(420px,100vw);z-index:900;background:var(--surface);box-shadow:-12px 0 40px rgba(1,43,36,.14);transform:translateX(100%);transition:transform .2s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+body.md-open #med-drawer{transform:none}
+.main-content{transition:margin-right .2s cubic-bezier(.16,1,.3,1),margin-left .2s}
+@media(min-width:1000px){body.md-open .main-content{margin-right:min(420px,36vw)}}
+.md-head{padding:20px 22px 14px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
+.md-head h2{font-size:18px;font-weight:800;margin:0}.md-head small{color:var(--text3)}
+.md-x{margin-left:auto;border:0;background:var(--surface3);width:34px;height:34px;border-radius:50%;cursor:pointer;color:var(--text2)}
+.md-body{padding:18px 22px;overflow:auto;flex:1}
+.md-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.md-k{background:var(--surface2);border-radius:14px;padding:12px}.md-k b{display:block;font-size:19px;font-weight:800}.md-k span{font-size:11px;color:var(--text3)}
+.md-gauge{height:10px;border-radius:99px;background:var(--surface3);overflow:hidden;margin:6px 0 16px}.md-gauge i{display:block;height:100%;border-radius:99px;background:var(--pg-dark);transition:width .4s cubic-bezier(.16,1,.3,1)}
+.md-row{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--border)}.md-row span{color:var(--text3)}
+.md-h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:18px 0 6px}
+.md-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px}
+.md-foot button{flex:1;border:0;border-radius:12px;padding:11px;font-weight:800;cursor:pointer;transition:transform .15s}.md-foot button:hover{transform:translateY(-1px)}
+.md-pri{background:var(--pg-lime);color:var(--pg-ink)}.md-sec{background:var(--surface3);color:var(--text)}
+#med-tb tr{cursor:pointer}
+/* ===== Scanner ===== */
+.scan-pill{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:99px;background:#DCFCE7;color:#15803D;transition:background .15s,color .15s}
+.scan-pill i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.scan-pill.hit{background:#10B981;color:#fff}.scan-pill.miss{background:#DC2626;color:#fff}
+@media(max-width:700px){.scan-pill{display:none}}
+tr.scan-flash td{animation:scFlash .15s ease-out 2}
+@keyframes scFlash{from{background:rgba(16,185,129,.28)}to{background:rgba(16,185,129,.1)}}
+.scan-pop{display:inline-block;animation:scPop .15s ease-out}
+@keyframes scPop{50%{transform:scale(1.1)}}
+.fz-hint{font-size:12px;color:var(--text2);background:var(--pg-lime);background:rgba(212,240,56,.35);border-radius:10px;padding:7px 12px;margin:0 0 10px;display:none}
+
+</style>
 </head>
 <body>
 
+<div id="rk-splash"><div class="rk-ring"><img id="rk-splash-logo" alt=""></div></div>
 <!-- ====== LOGIN ====== -->
 <div class="login-screen" id="loginScreen">
   <div class="login-bg-orb"></div>
@@ -812,13 +938,14 @@ code{font-family:'Courier New',monospace;font-size:11.5px;background:var(--surfa
     <div class="login-logo-wrap"><img id="login-logo-img" src="" alt="RKMS" style="display:none"><span class="material-icons-round" id="login-logo-icon" style="font-size:38px;color:var(--primary)">local_hospital</span></div>
     <div class="login-title">RKMS MediStock Pro</div>
     <div class="login-sub">Ramakrishna Mission Health Center</div>
+    <div id="lout-msg" style="display:none;margin:0 0 12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:600;text-align:center"><span class="material-icons-round" style="font-size:15px;vertical-align:middle">check_circle</span> You are logged out. Please sign in again to continue.</div>
     <div class="role-tabs">
       <button class="role-tab active" onclick="setRole('admin',this)"><span class="material-icons-round" style="font-size:14px">shield</span> Admin</button>
       <button class="role-tab" onclick="setRole('doctor',this)"><span class="material-icons-round" style="font-size:14px">medical_services</span> Doctor</button>
       <button class="role-tab" onclick="setRole('nurse',this)"><span class="material-icons-round" style="font-size:14px">medication</span> Nurse</button>
     </div>
-    <input class="login-input" type="text" id="lu" placeholder="Username" autocomplete="off">
-    <input class="login-input" type="password" id="lp" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <input class="login-input" type="text" id="lu" placeholder="Username" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <input class="login-input" type="password" id="lp" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="lerr"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">error</span> Wrong username or password!</div>
     <button class="login-btn" onclick="doLogin()"><span class="material-icons-round" style="font-size:18px">lock</span> Login to RKMS</button>
     <div id="g-wrap" style="display:none">
@@ -885,7 +1012,7 @@ code{font-family:'Courier New',monospace;font-size:11.5px;background:var(--surfa
     <span class="material-icons-round" id="tbar-icon">dashboard</span>
     <span id="tbar">Dashboard</span>
   </div>
-  <div class="topbar-right">
+  <div class="topbar-right"><div id="g-chip" onclick="showTab('dashboard')" style="display:none"></div>
     <div class="alert-badge" id="abadge" onclick="showTab('medicines')">
       <span class="material-icons-round" style="font-size:15px">notifications_active</span>
       <span id="anum">0</span> Alerts
@@ -903,6 +1030,7 @@ code{font-family:'Courier New',monospace;font-size:11.5px;background:var(--surfa
 <!-- ====== DASHBOARD ====== -->
 <div class="page-section active" id="sec-dashboard">
   <div class="page-header"><h1>📊 Dashboard</h1><p id="dash-welcome">Welcome! Here's today's overview.</p></div>
+  <div id="g-account-card"></div>
   <a id="gdrive-top-link" href="https://drive.google.com" target="_blank" class="gdrive-banner">
     <span class="material-icons-round" style="font-size:28px">folder_open</span>
     <div><div style="font-size:14px;font-weight:700">Google Drive Backup</div><div style="font-size:12px;opacity:.85">Click to open your Google Drive folder</div></div>
@@ -915,6 +1043,7 @@ code{font-family:'Courier New',monospace;font-size:11.5px;background:var(--surfa
     <div class="stat-card blue"><div class="stat-icon"><span class="material-icons-round">groups</span></div><div class="stat-label">Students</div><div class="stat-value" id="st-stu">0</div></div>
     <div class="stat-card purple"><div class="stat-icon"><span class="material-icons-round">check_circle</span></div><div class="stat-label">Today</div><div class="stat-value" id="st-today">0</div></div>
   </div>
+  <div id="pharm-widgets"></div>
   <div class="row g-3 mb-3">
     <div class="col-md-6"><div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">emergency</span> Active Alerts</div></div><div class="mcard-body" id="dash-alerts"></div></div></div>
     <div class="col-md-6"><div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">history</span> Recent Dispense</div></div>
@@ -1517,7 +1646,7 @@ function updateClock(){var n=new Date(),h=n.getHours(),m=n.getMinutes(),s=n.getS
 updateClock();setInterval(updateClock,1000);
 document.getElementById('sbdate').textContent=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
 document.addEventListener('click',function(e){if(!e.target.closest('.ac-wrap'))document.getElementById('acl').classList.remove('show');});
-var idleTimer;function resetIdle(){clearTimeout(idleTimer);idleTimer=setTimeout(function(){if(document.getElementById('app').style.display!=='none'){alert('Auto logout - inactivity!');doLogout();}},30*60*1000);}
+var idleTimer;function resetIdle(){clearTimeout(idleTimer);idleTimer=0; /* remembered login: no inactivity logout */}
 document.addEventListener('mousemove',resetIdle);document.addEventListener('keypress',resetIdle);resetIdle();
 </script>
 <!-- QR Code library (MIT licensed, github.com/kazuhikoarase/qrcode-generator) -->
@@ -4720,7 +4849,7 @@ if(document.readyState==='loading'){
 (function(){
 
 var API_BASE = (window.location.protocol === 'file:') ? 'http://127.0.0.1:8000' : '';
-var authToken = null;
+var authToken = localStorage.getItem('rkms_token') || null;
 
 // ---------- low-level fetch helper ----------
 async function apiFetch(path, options){
@@ -4828,13 +4957,134 @@ window.onGoogleLogin = async function(resp){
     e.textContent=err.message||'Google login failed'; e.style.display='block';
   }
 };
-window.doLogout = function(){
-  if(!confirm('Logout?'))return;
-  authToken=null; localStorage.removeItem('rkms_token');
+// ---------- session restore + single-login heartbeat + per-user Google Drive backup ----------
+var hbTimer=null, driveTimer=null, driveTok=null, driveExp=0, tokClient=null;
+function jwtSub(){try{return JSON.parse(atob(authToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub}catch(e){return 'user'}}
+function dKey(k){return 'rk_drive_'+jwtSub()+'_'+k}
+function paintBanner(){
+  var a=document.getElementById('gdrive-top-link'); if(!a||!authToken)return;
+  var last=localStorage.getItem(dKey('last')), folder=localStorage.getItem(dKey('folder'));
+  a.removeAttribute('target'); a.href='javascript:void(0)';
+  a.onclick=function(e){e.preventDefault();window.rkDriveBackup(true)};
+  a.children[0].textContent='cloud_upload'; a.children[2].textContent='backup';
+  a.children[1].innerHTML='<div style="font-size:14px;font-weight:700">Google Drive Backup</div><div style="font-size:12px;opacity:.85">'+
+    (last?'Last backup: '+last+' · tap to back up now':'Tap to back up to your own Google Drive')+
+    (folder?' · <u onclick="event.stopPropagation();window.open(\''+folder+'\',\'_blank\')">Open folder</u>':'')+'</div>';
+}
+function driveToken(interactive){
+  return new Promise(function(res,rej){
+    if(driveTok&&Date.now()<driveExp-60000)return res(driveTok);
+    if(!(window.google&&google.accounts&&google.accounts.oauth2))return rej(new Error('Google not loaded yet'));
+    if(!tokClient)tokClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',callback:function(){}});
+    tokClient.callback=function(r){
+      if(r.error)return rej(new Error(r.error));
+      driveTok=r.access_token; driveExp=Date.now()+(r.expires_in||3600)*1000; localStorage.setItem(dKey('ok'),'1'); res(driveTok);
+    };
+    tokClient.error_callback=function(e){rej(new Error((e&&e.type)||'popup closed'))};
+    var opt={prompt:interactive?'select_account':''}; if(window.__rkEmail)opt.hint=window.__rkEmail;
+    tokClient.requestAccessToken(opt);
+  });
+}
+async function gfetch(url,opt){
+  opt=opt||{}; opt.headers=Object.assign({Authorization:'Bearer '+driveTok},opt.headers);
+  var r=await fetch(url,opt); if(!r.ok)throw new Error('Google Drive error '+r.status); return r.json();
+}
+window.rkDriveBackup=async function(interactive){
+  try{
+    if(interactive)toast('Connecting to Google Drive…','info');
+    await driveToken(interactive);
+    var data=await apiGet('/backup/export-json');
+    var FOLDER='RKMS MediStock Backups', api='https://www.googleapis.com/drive/v3/files';
+    var q=encodeURIComponent("name='"+FOLDER+"' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+    var f=(await gfetch(api+'?q='+q+'&fields=files(id,webViewLink)')).files[0];
+    if(!f)f=await gfetch(api+'?fields=id,webViewLink',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:FOLDER,mimeType:'application/vnd.google-apps.folder'})});
+    var name='RKMS_Backup_'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'.json', b='rkms'+Date.now();
+    var body='--'+b+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:name,parents:[f.id]})+
+      '\r\n--'+b+'\r\nContent-Type: application/json\r\n\r\n'+JSON.stringify(data,null,1)+'\r\n--'+b+'--';
+    await gfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body:body});
+    localStorage.setItem(dKey('folder'),f.webViewLink); localStorage.setItem(dKey('last'),new Date().toLocaleString('en-IN'));
+    paintBanner(); toast('Backup saved in your Google Drive','success');
+  }catch(e){ if(interactive)toast('Drive backup failed: '+(e.message||e),'error'); else console.warn('auto backup skipped',e); }
+};
+function stopHeartbeat(){clearInterval(hbTimer);clearInterval(driveTimer);hbTimer=null;driveTimer=null;}
+function startHeartbeat(){
+  if(hbTimer)return;
+  hbTimer='on';
+  driveTimer=setInterval(function(){ if(authToken&&localStorage.getItem(dKey('ok')))window.rkDriveBackup(false); },30*60*1000);
+  paintBanner();
+}
+var GSVG='<svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.3-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.3-.4-4z"/></svg>';
+function esc2(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function whenGoogle(fn,n){n=n||0;if(window.google&&google.accounts&&google.accounts.id)return fn();if(n<30)setTimeout(function(){whenGoogle(fn,n+1)},300)}
+function gInit(cb){whenGoogle(function(){google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:cb})})}
+function avatar(g){var ini=esc2((g.name||g.email||'?').charAt(0).toUpperCase());
+  return g.picture?'<img class="ga-av" src="'+esc2(g.picture)+'" referrerpolicy="no-referrer" alt="">':'<div class="ga-av">'+ini+'</div>'}
+window.rkLinkGoogle=async function(resp){
+  try{await apiPostJSON('/auth/google/link',{credential:resp.credential,role:selRole});toast('Google account connected','success');refreshAccount();}
+  catch(e){toast(e.message||'Could not connect Google','error')}
+};
+window.rkUnlinkGoogle=async function(){
+  if(!confirm('Disconnect this Google account?'))return;
+  try{await apiPostJSON('/auth/google/unlink',{});toast('Google account disconnected','success');refreshAccount();}catch(e){toast(e.message,'error')}
+};
+function paintAccount(me){
+  var card=document.getElementById('g-account-card'),chip=document.getElementById('g-chip'),g=me&&me.google;
+  if(g){
+    card.innerHTML=avatar(g)+'<div class="ga-main"><b>'+esc2(g.name||g.email)+'<span class="ga-ok"><i></i>Connected</span></b><small>'+GSVG+' '+esc2(g.email)+' · '+esc2(me.role)+' · backups go to this Google Drive</small></div>'+
+      '<button class="ga-btn pri" onclick="rkDriveBackup(true)">Backup now</button><button class="ga-btn" onclick="rkUnlinkGoogle()">Disconnect</button>';
+    chip.style.display='flex';chip.innerHTML=avatar(g)+'<span>'+esc2(g.name||g.email)+'</span>';
+  }else{
+    card.innerHTML='<div class="ga-av" style="background:var(--surface3)">'+GSVG+'</div><div class="ga-main"><b>Google account not connected</b><small>Connect to show your account here and back up to your own Google Drive</small></div><div id="g-link-btn"></div>';
+    chip.style.display='flex';chip.innerHTML='<div class="ga-av" style="background:var(--text3)">'+GSVG+'</div><span>Connect Google</span>';
+    gInit(window.rkLinkGoogle);
+    whenGoogle(function(){google.accounts.id.renderButton(document.getElementById('g-link-btn'),{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:260})});
+  }
+}
+async function refreshAccount(){try{var me=await apiGet('/auth/me');window.__rkEmail=me.email||'';paintAccount(me)}catch(e){}}
+var _ld=window.loadData;
+window.loadData=async function(){ var r=await _ld.apply(this,arguments); if(authToken){localStorage.removeItem('rk_out');var lm=document.getElementById('lout-msg');if(lm)lm.style.display='none';startHeartbeat();refreshAccount();} return r; };
+window.rkRestoreSession=async function(){
+  var cl=document.documentElement.classList;
+  if(!authToken){cl.remove('rk-boot');if(localStorage.getItem('rk_out')){var m0=document.getElementById('lout-msg');if(m0)m0.style.display='block';}return;}
+  try{
+    var me=await apiGet('/auth/me'); window.__rkEmail=me.email||'';
+    try{var nt=await apiPostJSON('/auth/refresh',{}); if(nt&&nt.access_token){authToken=nt.access_token; localStorage.setItem('rkms_token',authToken);}}catch(_){}
+    selRole=me.role;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    document.getElementById('role-badge').textContent=selRole.charAt(0).toUpperCase()+selRole.slice(1);
+    await loadData(); renderAll(); updateDash(); applyRoleAccess(selRole);
+  }catch(e){
+    document.getElementById('app').style.display='none';
+    document.getElementById('loginScreen').style.display='flex';
+  }
+  cl.remove('rk-boot');
+};
+function askLogout(){return new Promise(function(res){
+  var ov=document.createElement('div');ov.className='sc-ov';ov.setAttribute('role','dialog');
+  ov.innerHTML='<div class="sc-card"><div class="sc-ic" style="background:#E0F0FF;color:#0A7BFF"><span class="material-icons-round">logout</span></div><h3>Log out of RKMS?</h3><p>You will need to sign in again on this laptop. Until then it stays signed in, so you can just close the tab.</p><label style="display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--text2);margin:0 0 14px;cursor:pointer"><input type="checkbox" id="lg-all"> Also log out from all my other laptops</label><div style="display:flex;gap:10px"><button class="ga-btn" style="flex:1" data-a="stay">Stay signed in</button><button class="ga-btn pri" style="flex:1" data-a="out">Log out</button></div></div>';
+  document.body.appendChild(ov);
+  function done(v){document.removeEventListener('keydown',k,true);ov.remove();res(v)}
+  function k(e){if(e.key==='Escape')done(false)}
+  document.addEventListener('keydown',k,true);
+  ov.addEventListener('click',function(e){var a=e.target.closest('[data-a]');if(a)done(a.dataset.a==='out'?(ov.querySelector('#lg-all').checked?'all':'out'):false);else if(e.target===ov)done(false)});
+  setTimeout(function(){ov.querySelector('[data-a=stay]').focus()},30);
+})}
+window.doLogout=async function(){
+  var how=await askLogout(); if(!how)return;
+  try{await apiFetch(how==='all'?'/auth/logout-all':'/auth/logout',{method:'POST'});}catch(e){}
+  stopHeartbeat(); authToken=null; localStorage.removeItem('rkms_token'); localStorage.setItem('rk_out','1');
+  driveTok=null; driveExp=0; tokClient=null; window.__rkEmail='';
+  var lm=document.getElementById('lout-msg'); if(lm)lm.style.display='block';
+  var lu=document.getElementById('lu'); if(lu)lu.value='';
+  if(window.google&&google.accounts)google.accounts.id.disableAutoSelect();
+  gInit(window.onGoogleLogin);
   document.getElementById('app').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('lp').value='';
+  if(window.toast)toast('Logged out safely. See you soon!','success');
 };
+
 
 // ---------- load all data from the API ----------
 window.save = function(){ /* no-op: data now lives in the backend database */ };
@@ -5415,6 +5665,170 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
+</script>
+<script>
+(function(){var u=localStorage.getItem("ms_logo")||(typeof LOGO_DATA!=="undefined"?LOGO_DATA:"");if(u){applyLogo(u);var sl=document.getElementById("rk-splash-logo");if(sl)sl.src=u;}})();
+(function(){
+  var COLORS=['#F97316','#111827','#BEF264'];
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function status(m){var t=new Date();t.setHours(0,0,0,0);
+    if(m.expiry&&new Date(m.expiry)<t)return['pw-bad','Expired'];
+    if(+m.qty<=+m.min)return['pw-low','Low stock'];return['pw-ok','In stock'];}
+  function render(){
+    var host=document.getElementById('pharm-widgets');if(!host)return;
+    var meds=window.meds||[],hist=window.hist||[],i;
+    // last 12 days of dispensed quantity
+    var days=[],today=new Date();today.setHours(0,0,0,0);
+    for(i=11;i>=0;i--){var d=new Date(today);d.setDate(d.getDate()-i);days.push({k:d.toDateString(),l:('0'+d.getDate()).slice(-2),v:0});}
+    hist.forEach(function(h){var k=new Date(h.dtRaw).toDateString();days.forEach(function(x){if(x.k===k)x.v+=+h.qty||0})});
+    var max=Math.max.apply(null,days.map(function(x){return x.v}).concat([1])),pk=days.findIndex(function(x){return x.v===max&&max>1});
+    var bars=days.map(function(x,n){var h=Math.max(4,Math.round(x.v/max*100));
+      return '<div class="pw-col">'+(n===pk?'<div class="pw-tip">'+x.v+' units</div>':'')+'<div class="pw-bar'+(n===pk?' peak':'')+'" style="height:'+h+'%;animation-delay:'+n*18+'ms"></div><span>'+x.l+'</span></div>';}).join('');
+    // top selling
+    var tot={};hist.forEach(function(h){tot[h.medicine]=(tot[h.medicine]||0)+(+h.qty||0)});
+    var top=Object.keys(tot).map(function(k){return[k,tot[k]]}).sort(function(a,b){return b[1]-a[1]}).slice(0,3);
+    var tm=Math.max.apply(null,top.map(function(t){return t[1]}).concat([1]));
+    var pills=top.length?top.map(function(t,n){return '<div class="pw-pill-wrap"><div class="pw-pill" style="height:'+Math.max(30,Math.round(t[1]/tm*85))+'%;background:'+COLORS[n]+';color:'+(n===2?'#111':'#fff')+';animation-delay:'+n*80+'ms">'+t[1]+'</div>'+esc(t[0])+'</div>'}).join(''):'<small>No dispense data yet</small>';
+    // latest stock rows (most urgent first)
+    var rows=meds.slice().sort(function(a,b){return (status(a)[0]==='pw-ok')-(status(b)[0]==='pw-ok')}).slice(0,6).map(function(m){var s=status(m);
+      return '<tr><td><b>'+esc(m.name)+'</b></td><td>'+esc(m.batch||'-')+'</td><td>'+m.qty+'</td><td>₹'+(m.price||0)+'</td><td><span class="pw-chip '+s[0]+'"><i></i>'+s[1]+'</span></td><td><span class="pw-act" onclick="showTab(\'medicines\')"><span class="material-icons-round">visibility</span><span class="material-icons-round">edit</span></span></td></tr>';}).join('');
+    host.innerHTML='<div class="pw-card"><h3>Dispense Analytics</h3><small>Units dispensed · last 12 days</small><div class="pw-bars">'+bars+'</div><div style="height:16px"></div></div>'+
+      '<div class="pw-card" style="animation-delay:.08s"><h3>Top Selling Medicine</h3><small>By units dispensed</small><div class="pw-pillars">'+pills+'</div></div>'+
+      '<div class="pw-card pw-wide" style="animation-delay:.16s"><h3>Stock Watchlist</h3><small>Expired and low items first</small><table class="pw-table"><thead><tr><th>Medicine</th><th>Batch</th><th>Qty</th><th>Price</th><th>Status</th><th>Action</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6"><small>No medicines yet</small></td></tr>')+'</tbody></table></div>';
+  }
+  var o=window.updateDash;window.updateDash=function(){if(o)o.apply(this,arguments);try{render()}catch(e){console.error(e)}};
+  window.rkRenderWidgets=render;
+})();
+
+// ===== Professional UX layer: slide-to-confirm, medicine drawer, fuzzy search, scanner shield =====
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function T(m,t){try{window.toast&&window.toast(m,t||'info')}catch(e){}}
+
+  /* ---- 1. Slide-to-confirm (mouse, touch, or hold Enter 1s) ---- */
+  function slideConfirm(o){return new Promise(function(resolve){
+    var ov=document.createElement('div');ov.className='sc-ov';ov.setAttribute('role','alertdialog');ov.setAttribute('aria-modal','true');
+    ov.innerHTML='<div class="sc-card"><div class="sc-ic"><span class="material-icons-round">'+(o.icon||'delete_forever')+'</span></div><h3>'+esc(o.title)+'</h3><p>'+esc(o.msg)+'</p>'+
+      '<div class="sc-track"><div class="sc-fill"></div><span class="sc-label">Slide to confirm</span><button class="sc-knob" aria-label="Slide to confirm, or hold Enter for one second"><span class="material-icons-round">chevron_right</span></button></div>'+
+      '<button class="sc-cancel">Cancel</button><div class="sc-hint">Keyboard: hold Enter for 1 second · Esc to cancel</div></div>';
+    document.body.appendChild(ov);
+    var tr=ov.querySelector('.sc-track'),kn=ov.querySelector('.sc-knob'),fl=ov.querySelector('.sc-fill'),done=false,x0=0,drag=false,hold=null;
+    function max(){return tr.clientWidth-kn.offsetWidth-8}
+    function set(x){kn.style.transform='translateX('+x+'px)';fl.style.width=(x+kn.offsetWidth+4)+'px'}
+    function close(v){if(done)return;done=true;document.removeEventListener('keydown',esc_,true);ov.remove();resolve(v)}
+    function finish(){done||(set(max()),kn.querySelector('span').textContent='check',setTimeout(function(){close(true)},180))}
+    function back(){kn.classList.add('sc-back');fl.classList.add('sc-back');set(0);setTimeout(function(){kn.classList.remove('sc-back');fl.classList.remove('sc-back')},220)}
+    kn.addEventListener('pointerdown',function(e){drag=true;x0=e.clientX;kn.setPointerCapture(e.pointerId);kn.style.cursor='grabbing'});
+    kn.addEventListener('pointermove',function(e){if(!drag)return;set(Math.max(0,Math.min(max(),e.clientX-x0)))});
+    kn.addEventListener('pointerup',function(e){if(!drag)return;drag=false;kn.style.cursor='grab';var x=Math.max(0,Math.min(max(),e.clientX-x0));x>=max()*.92?finish():back()});
+    kn.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&!e.repeat&&!hold){e.preventDefault();var t0=performance.now();hold=requestAnimationFrame(function step(){var p=Math.min(1,(performance.now()-t0)/1000);set(p*max());if(p>=1){hold=null;finish()}else if(hold)hold=requestAnimationFrame(step)})}});
+    kn.addEventListener('keyup',function(){if(hold){cancelAnimationFrame(hold);hold=null;if(!done)back()}});
+    ov.querySelector('.sc-cancel').onclick=function(){close(false)};
+    ov.addEventListener('mousedown',function(e){if(e.target===ov)close(false)});
+    function esc_(e){if(e.key==='Escape'){e.stopPropagation();close(false)}}
+    document.addEventListener('keydown',esc_,true);
+    setTimeout(function(){kn.focus()},30);
+  })}
+  window.slideConfirm=slideConfirm;
+
+  var DEST={
+    delMed:['Delete this medicine?','The stock record and batch details are removed permanently.'],
+    delDoc:['Delete this doctor?','This doctor record is removed permanently.'],
+    delStu:['Delete this student?','The student record is removed permanently.'],
+    delHist:['Delete this dispense record?','The entry is removed from history.'],
+    clearAllHist:['Clear ALL dispense history?','Every dispense record is erased. This cannot be undone.'],
+    clearLog:['Clear the activity log?','The audit trail is erased. This cannot be undone.']
+  };
+  var skip=false,oc=window.confirm;
+  window.confirm=function(m){if(skip){skip=false;return true}return oc.call(window,m)};
+  function wrapDestructive(){
+    Object.keys(DEST).forEach(function(n){var f=window[n];if(typeof f!=='function'||f.__rk)return;
+      var w=function(){var a=arguments,self=this;
+        if(n==='clearAllHist'&&!(window.hist||[]).length)return f.apply(self,a);
+        slideConfirm({title:DEST[n][0],msg:DEST[n][1]}).then(function(ok){if(!ok)return;skip=true;try{f.apply(self,a)}finally{skip=false}});};
+      w.__rk=1;window[n]=w;});
+  }
+
+  /* ---- 2. Fuzzy + alias search ---- */
+  var ALIAS=[['paracetamol','acetaminophen'],['salbutamol','albuterol'],['adrenaline','epinephrine'],['furosemide','frusemide'],['lidocaine','lignocaine'],['glibenclamide','glyburide'],['pethidine','meperidine'],['amoxicillin','amoxycillin'],['noradrenaline','norepinephrine'],['rifampicin','rifampin']];
+  function lev(a,b,lim){var m=a.length,n=b.length;if(Math.abs(m-n)>lim)return lim+1;var p=[],i,j;for(j=0;j<=n;j++)p[j]=j;
+    for(i=1;i<=m;i++){var c=[i],mn=i;for(j=1;j<=n;j++){c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));if(c[j]<mn)mn=c[j]}if(mn>lim)return lim+1;p=c}return p[n]}
+  function expand(q){var out=[q];ALIAS.forEach(function(g){if(g.indexOf(q)>-1)g.forEach(function(x){out.push(x)})});return out}
+  function score(m,q){
+    var hay=((m.name||'')+' '+(m.cat||'')+' '+(m.batch||'')+' '+(m.note||'')).toLowerCase();
+    var words=hay.split(/[^a-z0-9]+/).filter(Boolean),best=0,exact=false;
+    expand(q).forEach(function(qq){
+      if(hay.indexOf(qq)>-1){best=Math.max(best,100);exact=true;return}
+      var lim=qq.length<=3||/\d/.test(qq)?0:qq.length<=6?1:2;if(!lim)return;
+      words.forEach(function(w){var d=Math.min(lev(qq,w,lim),lev(qq,w.slice(0,qq.length),lim));if(d<=lim)best=Math.max(best,80-d*15)})});
+    return{s:best,exact:exact};
+  }
+  function hint(msg){var tb=document.getElementById('med-tb');if(!tb)return;var wrap=tb.closest('.table-wrap')||tb.parentNode,h=document.getElementById('fz-hint');
+    if(!h){h=document.createElement('div');h.id='fz-hint';h.className='fz-hint';wrap.parentNode.insertBefore(h,wrap)}
+    h.style.display=msg?'block':'none';h.textContent=msg||''}
+  window.filterMeds=function(v){
+    var q=(v||'').trim().toLowerCase(),list=(window.meds||[]).slice();
+    if(window.catFilter&&window.catFilter!=='All')list=list.filter(function(m){return m.cat===window.catFilter});
+    if(!q){hint('');return window.renderMeds(list)}
+    var sc=list.map(function(m){return{m:m,r:score(m,q)}}).filter(function(x){return x.r.s>0}).sort(function(a,b){return b.r.s-a.r.s});
+    var fuzzy=sc.length&&!sc.some(function(x){return x.r.exact});
+    hint(sc.length?(fuzzy?'No exact match — showing close matches for "'+v+'"':''):'No medicine matches "'+v+'". Check the spelling or scan the barcode.');
+    window.renderMeds(sc.map(function(x){return x.m}));
+  };
+
+  /* ---- 3. Medicine detail drawer ---- */
+  var dr;
+  function ensureDrawer(){if(dr)return dr;dr=document.createElement('aside');dr.id='med-drawer';dr.setAttribute('aria-hidden','true');dr.setAttribute('aria-label','Medicine details');document.body.appendChild(dr);return dr}
+  function medById(id){return (window.meds||[]).find(function(x){return +x.id===+id})}
+  window.openMedDrawer=function(id){
+    var m=medById(id);if(!m)return;ensureDrawer();
+    var st=window.medSt?window.medSt(m):{l:'',c:'success'},min=+m.min||1,pct=Math.max(3,Math.min(100,Math.round(m.qty/(min*3)*100)));
+    var days=m.expiry?Math.ceil((new Date(m.expiry)-new Date())/86400000):null;
+    var rec=(window.hist||[]).filter(function(h){return h.medicine===m.name}).slice(0,8).map(function(h){return '<div class="md-row"><b>'+esc(h.studentName)+'</b><span>'+h.qty+' · '+esc(h.dt)+'</span></div>'}).join('')||'<div class="md-row"><span>No dispense yet</span></div>';
+    dr.innerHTML='<div class="md-head"><div><h2>'+esc(m.name)+'</h2><small>Batch '+esc(m.batch||'—')+'</small> <span class="mbadge '+st.c+'">'+esc(st.l)+'</span></div><button class="md-x" aria-label="Close" onclick="closeMedDrawer()"><span class="material-icons-round">close</span></button></div>'+
+      '<div class="md-body"><div class="md-grid"><div class="md-k"><b>'+m.qty+'</b><span>In stock</span></div><div class="md-k"><b>'+(m.min||0)+'</b><span>Minimum alert</span></div><div class="md-k"><b>₹'+(+m.price||0).toFixed(2)+'</b><span>Unit price</span></div><div class="md-k"><b>₹'+(m.qty*(m.price||0)).toFixed(0)+'</b><span>Stock value</span></div></div>'+
+      '<span style="font-size:11px;color:var(--text3)">Stock level vs 3× minimum</span><div class="md-gauge"><i style="width:'+pct+'%;background:'+(st.c==='danger'?'#DC2626':st.c==='warning'?'#F59E0B':'var(--pg-dark)')+'"></i></div>'+
+      '<div class="md-row"><span>Category</span><b>'+esc(m.cat||'—')+'</b></div><div class="md-row"><span>Dose</span><b>'+esc(m.dose||'—')+'</b></div><div class="md-row"><span>Expiry</span><b>'+esc(m.expiry||'—')+(days!==null?' ('+(days<=0?'expired':days+' days')+')':'')+'</b></div>'+(m.note?'<div class="md-row"><span>Note</span><b>'+esc(m.note)+'</b></div>':'')+
+      '<div class="md-h4">Recent dispense</div>'+rec+'</div>'+
+      '<div class="md-foot"><button class="md-sec" onclick="openEditMed('+m.id+')">Edit</button><button class="md-pri" onclick="openRestock('+m.id+')">Restock</button></div>';
+    dr.setAttribute('aria-hidden','false');document.body.classList.add('md-open');
+  };
+  window.closeMedDrawer=function(){document.body.classList.remove('md-open');dr&&dr.setAttribute('aria-hidden','true')};
+  document.addEventListener('click',function(e){var tr=e.target.closest&&e.target.closest('#med-tb tr');if(!tr||e.target.closest('button'))return;
+    var mt=/openEditMed\((\d+)\)/.exec(tr.innerHTML);if(mt)window.openMedDrawer(mt[1])});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.body.classList.contains('md-open')&&!document.querySelector('.sc-ov'))window.closeMedDrawer()});
+
+  /* ---- 4. Scanner focus shield + shortcuts ---- */
+  var buf='',last=0,fast=0,pill;
+  function pillFlash(c){if(!pill)return;pill.classList.add(c);setTimeout(function(){pill.classList.remove(c)},700)}
+  function handleScan(code){
+    var c=code.trim().toLowerCase(),m=(window.meds||[]).find(function(x){return (x.batch||'').toLowerCase()===c})||(window.meds||[]).find(function(x){return (x.name||'').toLowerCase()===c});
+    if(!m){pillFlash('miss');T('Unknown code: '+code,'error');return}
+    pillFlash('hit');window.showTab&&window.showTab('medicines');
+    setTimeout(function(){window.filterMeds('');var row=[].find.call(document.querySelectorAll('#med-tb tr'),function(r){return r.innerHTML.indexOf('openEditMed('+m.id+')')>-1});
+      if(row){row.classList.add('scan-flash');var q=row.querySelectorAll('td')[4];q&&q.firstElementChild&&q.firstElementChild.classList.add('scan-pop');row.scrollIntoView({block:'center',behavior:'smooth'})}
+      window.openMedDrawer(m.id);T(m.name+' · '+m.qty+' in stock','success')},80);
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.ctrlKey||e.metaKey||e.altKey||document.querySelector('.sc-ov'))return;
+    var t=e.target,ed=t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)),sr=t&&t.classList&&t.classList.contains('search-input');
+    if(!ed&&e.key==='/'){var s=document.querySelector('.page-section.active .search-input');if(s){e.preventDefault();s.focus()}return}
+    if(ed&&!sr)return;                       // never hijack data-entry fields
+    var now=performance.now(),gap=now-last;last=now;
+    if(e.key==='Enter'){if(buf.length>=4&&fast>=3){e.preventDefault();var code=buf;buf='';fast=0;if(sr){t.value='';window.filterMeds&&window.filterMeds('')}handleScan(code)}else{buf='';fast=0}return}
+    if(e.key.length===1){if(gap>60){buf='';fast=0}buf+=e.key;if(gap<=60&&buf.length>1)fast++;if(!ed&&fast>=2)e.preventDefault()}
+  },true);
+  document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){var s=document.querySelector('.page-section.active .search-input');if(s){e.preventDefault();s.focus();s.select()}}});
+
+  function install(){
+    wrapDestructive();
+    if(!document.getElementById('scan-pill')){var r=document.querySelector('.topbar-right');if(r){pill=document.createElement('div');pill.id='scan-pill';pill.className='scan-pill';pill.title='Barcode scanner works anywhere on this screen';pill.innerHTML='<i></i>Scanner ready';r.insertBefore(pill,r.firstChild)}}else pill=document.getElementById('scan-pill');
+  }
+  document.addEventListener('DOMContentLoaded',function(){install();setTimeout(install,500)});
+  window.addEventListener('load',function(){install();setTimeout(install,800)});
+})();
+
+(function(){function go(){window.rkRestoreSession&&window.rkRestoreSession()}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go();})();
 </script>
 </body>
 </html>

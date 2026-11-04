@@ -32,6 +32,7 @@
 """
 
 import os
+import calendar
 import io
 import csv
 import json
@@ -79,7 +80,7 @@ if DATABASE_URL.startswith("postgresql://"):
 
 SECRET_KEY = os.environ.get("RKMS_SECRET_KEY", "rkms-medistock-change-this-secret-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 12 * 60  # 12 hours — matches the 30-min idle logout in the frontend session
+ACCESS_TOKEN_EXPIRE_MINUTES = 30 * 24 * 60  # 30 days — a laptop that logged in once stays logged in (renewed on every open)
 
 # ---- Google login settings ----
 GOOGLE_CLIENT_ID = os.environ.get(
@@ -118,6 +119,12 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False, default="nurse")  # admin | doctor | nurse
+    email = Column(String, default="", index=True)          # Google email (blank for password users)
+    session_id = Column(String, default="")                 # the ONE live session allowed for this account
+    session_seen = Column(DateTime)                         # last heartbeat of that session
+    g_name = Column(String, default="")                     # linked Google profile (shown on dashboard)
+    g_picture = Column(String, default="")
+    logged_out_at = Column(DateTime)                        # "log out everywhere": tokens issued before this are rejected
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -201,6 +208,21 @@ class ActivityLog(Base):
 
 
 Base.metadata.create_all(bind=engine)
+
+
+def _migrate_user_columns():
+    """Adds the new session columns to an already-existing users table (SQLite/Postgres)."""
+    from sqlalchemy import inspect, text
+    cols = {c["name"] for c in inspect(engine).get_columns("users")}
+    add = {"email": "VARCHAR DEFAULT ''", "session_id": "VARCHAR DEFAULT ''", "session_seen": "TIMESTAMP",
+           "g_name": "VARCHAR DEFAULT ''", "g_picture": "VARCHAR DEFAULT ''", "logged_out_at": "TIMESTAMP"}
+    with engine.begin() as conn:
+        for name, ddl in add.items():
+            if name not in cols:
+                conn.execute(text(f"ALTER TABLE users ADD COLUMN {name} {ddl}"))
+
+
+_migrate_user_columns()
 
 # ================================================================
 # 4. SCHEMAS (Pydantic) — request / response shapes
@@ -343,8 +365,20 @@ def verify_password(pw: str, pw_hash: str) -> bool:
 
 def create_access_token(data: dict, expires_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES) -> str:
     to_encode = data.copy()
+    to_encode["iat"] = datetime.utcnow()
     to_encode["exp"] = datetime.utcnow() + timedelta(minutes=expires_minutes)
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+# ---- Remembered login (per laptop/browser) ----
+# The browser keeps its token, so reopening the site on the same laptop goes straight to the dashboard.
+# Several people/devices may be logged in at the same time; the token is renewed on every open (/auth/refresh).
+def start_session(db: Session, user: User, email: str = "") -> str:
+    """Records the Google email on the user row (if any). No login blocking."""
+    if email and user.email != email:
+        user.email = email
+        db.commit()
+    return ""
 
 
 def seed_default_users(db: Session):
@@ -371,6 +405,9 @@ def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session 
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise cred_exc
+    if user.logged_out_at is not None and int(payload.get("iat", 0)) < calendar.timegm(user.logged_out_at.utctimetuple()):
+        raise HTTPException(status_code=401, detail="Logged out from all devices",
+                            headers={"WWW-Authenticate": "Bearer"})
     return user
 
 
@@ -519,7 +556,8 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     user = db.query(User).filter(User.username == form.username.lower()).first()
     if not user or not verify_password(form.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Wrong username or password!")
-    token = create_access_token({"sub": user.username, "role": user.role})
+    sid = start_session(db, user)
+    token = create_access_token({"sub": user.username, "role": user.role, "sid": sid})
     log_action(db, f"{user.role} logged in", user.username, "info")
     return Token(access_token=token, role=user.role, username=user.username)
 
@@ -552,7 +590,10 @@ def google_login(payload: GoogleLogin, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(user)
 
-    token = create_access_token({"sub": user.username, "role": user.role})
+    user.g_name = info.get("name") or user.g_name or ""
+    user.g_picture = info.get("picture") or user.g_picture or ""
+    sid = start_session(db, user, email)
+    token = create_access_token({"sub": user.username, "role": user.role, "sid": sid})
     log_action(db, f"{user.role} logged in via Google", user.username, "info")
     return Token(access_token=token, role=user.role, username=user.username)
 
@@ -571,7 +612,60 @@ def create_user(payload: UserCreate, db: Session = Depends(get_db),
 
 @app.get("/auth/me", tags=["Auth"])
 def me(current: User = Depends(get_current_user)):
-    return {"username": current.username, "role": current.role}
+    """Also used as the heartbeat + 'restore my session after refresh' call."""
+    return {"username": current.username, "role": current.role, "email": current.email or "",
+            "google": {"email": current.email or "", "name": current.g_name or "", "picture": current.g_picture or ""}
+                      if current.email else None}
+
+
+@app.post("/auth/google/link", tags=["Auth"])
+def google_link(payload: GoogleLogin, db: Session = Depends(get_db), current: User = Depends(get_current_user)):
+    """Connect a Google account to the person who is ALREADY logged in (e.g. with username/password)."""
+    info = verify_google_token(payload.credential)
+    email = (info.get("email") or "").lower()
+    if not email or not info.get("email_verified"):
+        raise HTTPException(status_code=401, detail="Google email is not verified")
+    if GOOGLE_ALLOWED_DOMAINS and email.split("@")[-1] not in GOOGLE_ALLOWED_DOMAINS:
+        raise HTTPException(status_code=403, detail="This Google account is not allowed")
+    current.email = email
+    current.g_name = info.get("name") or ""
+    current.g_picture = info.get("picture") or ""
+    db.commit()
+    log_action(db, f"Google account linked: {email}", current.username, "info")
+    return {"email": email, "name": current.g_name, "picture": current.g_picture}
+
+
+@app.post("/auth/google/unlink", tags=["Auth"])
+def google_unlink(db: Session = Depends(get_db), current: User = Depends(get_current_user)):
+    current.email = ""
+    current.g_name = ""
+    current.g_picture = ""
+    db.commit()
+    log_action(db, "Google account disconnected", current.username, "info")
+    return {"ok": True}
+
+
+@app.post("/auth/logout", tags=["Auth"])
+def logout(db: Session = Depends(get_db), current: User = Depends(get_current_user)):
+    """Only the person pressing Logout leaves; the browser then forgets its token."""
+    log_action(db, f"{current.role} logged out", current.username, "info")
+    return {"ok": True}
+
+
+@app.post("/auth/logout-all", tags=["Auth"])
+def logout_all(db: Session = Depends(get_db), current: User = Depends(get_current_user)):
+    """Optional: ends this account's login on EVERY laptop/browser, not just this one."""
+    current.logged_out_at = datetime.utcnow()
+    db.commit()
+    log_action(db, f"{current.role} logged out from all devices", current.username, "info")
+    return {"ok": True}
+
+
+@app.post("/auth/refresh", response_model=Token, tags=["Auth"])
+def refresh(current: User = Depends(get_current_user)):
+    """Called every time the site opens on a remembered laptop: hands out a fresh 30-day token."""
+    token = create_access_token({"sub": current.username, "role": current.role})
+    return Token(access_token=token, role=current.role, username=current.username)
 
 
 # ================================================================
@@ -1098,10 +1192,11 @@ def backup_restore(file: UploadFile = File(...), current: User = Depends(require
 
 
 @app.get("/backup/export-json", tags=["Backup"])
-def backup_export_json(db: Session = Depends(get_db), current: User = Depends(require_role("admin"))):
+def backup_export_json(db: Session = Depends(get_db), current: User = Depends(get_current_user)):
     """A human-readable JSON backup, mirrors the original app's 'Download Backup (JSON)' button."""
     data = {
         "exported_at": datetime.utcnow().isoformat(),
+        "exported_by": current.username,
         "medicines": [MedicineOut.model_validate(m).model_dump(mode="json") for m in db.query(Medicine).all()],
         "students": [StudentOut.model_validate(s).model_dump(mode="json") for s in db.query(Student).all()],
         "doctors": [DoctorOut.model_validate(d).model_dump(mode="json") for d in db.query(Doctor).all()],
