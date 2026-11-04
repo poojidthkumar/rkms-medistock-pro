@@ -925,6 +925,101 @@ tr.scan-flash td{animation:scFlash .15s ease-out 2}
 .fz-hint{font-size:12px;color:var(--text2);background:var(--pg-lime);background:rgba(212,240,56,.35);border-radius:10px;padding:7px 12px;margin:0 0 10px;display:none}
 
 </style>
+
+<style id="rk-ui-v2">
+/* ================= RKMS UI v2 : login full-screen fix + template-style dashboard ================= */
+:root{--primary:#5B5BF7;--primary-dark:#4338CA;--primary-light:#EEF0FF;--primary-mid:#C7C9FF;
+  --pg-dark:#5B5BF7;--pg-dark2:#4A49E8;--pg-ink:#1E1B4B;--sidebar-w:250px}
+
+/* ---- 1. LOGIN: cover the WHOLE screen (the old override changed fixed -> relative, so a white strip showed) ---- */
+.login-screen{position:fixed!important;inset:0!important;width:100%;height:100%;min-height:100vh;
+  overflow-x:hidden!important;overflow-y:auto!important;padding:24px 16px;z-index:9999}
+.login-screen::after{inset:0 -40%!important;pointer-events:none}
+.login-card{margin:auto;max-width:100%}
+@media(max-width:480px){.login-card{padding:1.6rem!important;width:100%!important}}
+body:has(#app[style*="none"]) .chat-fab,
+body:has(#app[style*="none"]) .fab-btn,
+body:has(#app[style*="none"]) #chatPanel{display:none!important}
+
+/* ---- 2. TEMPLATE LOOK (light mode) ---- */
+body:not(.dark-mode){background:#E8EAFF}
+body:not(.dark-mode) .sidebar{left:16px;top:16px;height:calc(100vh - 32px);border-radius:28px;
+  background:linear-gradient(180deg,#5F5FF8 0%,#4B4AE6 100%);box-shadow:0 18px 40px rgba(75,74,230,.28)}
+body:not(.dark-mode) .sidebar-logo{background:transparent!important;border-bottom:1px solid rgba(255,255,255,.14)}
+body:not(.dark-mode) .sidebar .nav-section-label{color:rgba(255,255,255,.5)}
+body:not(.dark-mode) .sidebar .nav-item{color:rgba(255,255,255,.82);border-radius:14px}
+body:not(.dark-mode) .sidebar .nav-item .material-icons-round{color:rgba(255,255,255,.7)}
+body:not(.dark-mode) .sidebar .nav-item:hover{background:rgba(255,255,255,.14);color:#fff}
+body:not(.dark-mode) .sidebar .nav-item.active{background:#fff;color:#4338CA;font-weight:700;box-shadow:0 8px 20px rgba(20,20,120,.25)}
+body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:#5B5BF7}
+body:not(.dark-mode) .sidebar .nav-item.active::before{content:'';position:absolute;left:-8px;top:20%;height:60%;width:4px;border-radius:0 4px 4px 0;background:#fff}
+body:not(.dark-mode) .sidebar-footer{border-top:1px solid rgba(255,255,255,.14)}
+body:not(.dark-mode) .sidebar .footer-btn{color:rgba(255,255,255,.85)}
+body:not(.dark-mode) .sidebar .footer-btn:hover{background:rgba(255,255,255,.14);color:#fff}
+body:not(.dark-mode) .sidebar .footer-btn[onclick*="doLogout"]{color:#FFD3D3!important}
+body:not(.dark-mode) .sidebar .footer-btn[onclick*="exportCSV"]{color:#C9F7DD!important}
+.main-content{margin-left:calc(var(--sidebar-w) + 32px)}
+.content-area{padding:18px 20px 28px 4px}
+.topbar{margin:16px 20px 0 4px;border-radius:22px;height:68px;padding:0 18px 0 22px;top:16px;
+  background:var(--surface)!important;box-shadow:0 6px 24px rgba(75,74,230,.08)}
+.topbar-title{font-size:16px;font-weight:800}
+.topbar-right{gap:14px}
+.page-header h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.page-header p{font-size:13.5px}
+.stats-grid{gap:16px}
+.stat-card,.stat-card.green,body:not(.dark-mode) .stat-card.green{background:var(--surface)!important;color:var(--text)!important;
+  padding:16px 18px 14px!important;min-height:150px;display:flex;flex-direction:column;border-radius:22px!important}
+.stat-card::before,body:not(.dark-mode) .stat-card.green::before{display:none!important}
+.stat-card .stat-label,body:not(.dark-mode) .stat-card.green .stat-label{order:1;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text3)!important;font-weight:600}
+.stat-card .stat-value{order:2;font-size:28px;margin-top:4px}
+.stat-card .stat-icon{position:absolute;top:14px;right:14px;margin:0;width:34px;height:34px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;background:var(--primary-light)}
+.stat-card .stat-icon .material-icons-round{font-size:19px}
+.stat-card.green .stat-icon{color:#5B5BF7!important}
+.stat-card.amber .stat-icon{background:#FFF4D6}.stat-card.red .stat-icon{background:#FFE4EA}
+.stat-card.blue .stat-icon{background:#E0F0FF}.stat-card.purple .stat-icon{background:#EDE9FE}
+.rk-mini{order:3;display:flex;align-items:flex-end;gap:5px;height:46px;margin-top:auto;padding-top:10px}
+.rk-mini i{flex:1;border-radius:99px;min-height:6px;background:linear-gradient(#9C9CFF,#5B5BF7);animation:pwGrow .5s ease-out both}
+.rk-mini.pink i{background:linear-gradient(#FF9DB8,#F43F73)}
+.mcard,.pw-card{border-radius:22px!important}
+.pw-bar{background:linear-gradient(#8B8BFF,#5B5BF7)}
+.pw-bar.peak{background:linear-gradient(#FF9DB8,#F43F73)}
+.pw-tip{background:#1E1B4B}
+.mbtn.primary{box-shadow:0 4px 14px rgba(91,91,247,.35)}
+.mtable tbody tr:hover td{background:rgba(91,91,247,.05)}
+
+/* recent dispense list ("Recent Messages" style) */
+.rk-av{width:38px;height:38px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,#7C7CFF,#5B5BF7);object-fit:cover}
+#dash-rec td{padding:10px 8px;vertical-align:middle}
+#dash-rec td:first-child{width:50px}
+.rk-time{color:var(--text3);font-size:11.5px;white-space:nowrap}
+
+/* ---- 3. TOP-RIGHT: Google login + user ---- */
+#g-chip{display:none!important}
+#rk-user{display:flex;align-items:center;gap:12px;position:relative}
+.rk-chip{display:flex;align-items:center;gap:10px;border:0;background:transparent;cursor:pointer;padding:4px 6px 4px 4px;border-radius:99px;
+  font-family:inherit;color:var(--text);transition:background .15s}
+.rk-chip:hover{background:var(--surface3)}
+.rk-chip .rk-av{position:relative;width:42px;height:42px}
+.rk-ct{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;max-width:190px}
+.rk-ct b{font-size:13.5px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk-ct small{font-size:11.5px;color:var(--text3);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk-dot{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:#22C55E;border:2px solid var(--surface)}
+.rk-gbadge{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center}
+.rk-gbadge svg{width:11px;height:11px}
+.rk-top-g{min-width:150px;height:36px;display:flex;align-items:center;overflow:hidden;border-radius:99px}
+.rk-menu{position:absolute;right:0;top:calc(100% + 10px);min-width:220px;background:var(--surface);border-radius:16px;padding:8px;
+  box-shadow:0 18px 40px rgba(20,20,80,.22);border:1px solid var(--border);display:none;z-index:300}
+.rk-menu.show{display:block;animation:pgRise .18s both}
+.rk-menu button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 12px;border-radius:10px;cursor:pointer;
+  font:600 13px inherit;font-family:inherit;color:var(--text);text-align:left}
+.rk-menu button:hover{background:var(--surface3)}
+.rk-menu .material-icons-round{font-size:18px;color:var(--text2)}
+.rk-menu .rk-out,.rk-menu .rk-out .material-icons-round{color:#DC2626}
+@media(max-width:900px){.rk-ct{display:none}.rk-top-g{min-width:0}.main-content{margin-left:0}
+  body:not(.dark-mode) .sidebar{left:0;top:0;height:100vh;border-radius:0}.topbar{margin:10px}.content-area{padding:10px}}
+</style>
 </head>
 <body>
 
@@ -5027,7 +5122,7 @@ window.rkUnlinkGoogle=async function(){
   if(!confirm('Disconnect this Google account?'))return;
   try{await apiPostJSON('/auth/google/unlink',{});toast('Google account disconnected','success');refreshAccount();}catch(e){toast(e.message,'error')}
 };
-function paintAccount(me){
+function paintAccount(me){try{window.rkPaintTop&&window.rkPaintTop(me)}catch(_e){}
   var card=document.getElementById('g-account-card'),chip=document.getElementById('g-chip'),g=me&&me.google;
   if(g){
     card.innerHTML=avatar(g)+'<div class="ga-main"><b>'+esc2(g.name||g.email)+'<span class="ga-ok"><i></i>Connected</span></b><small>'+GSVG+' '+esc2(g.email)+' · '+esc2(me.role)+' · backups go to this Google Drive</small></div>'+
@@ -5829,6 +5924,91 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 
 (function(){function go(){window.rkRestoreSession&&window.rkRestoreSession()}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go();})();
+</script>
+
+<script id="rk-ui-v2-js">
+(function(){
+  function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function cap(s){s=String(s||'');return s.charAt(0).toUpperCase()+s.slice(1)}
+  var lastMe=null;
+
+  /* ---------- top-right user + Google ---------- */
+  function host(){
+    var r=document.querySelector('.topbar-right'); if(!r)return null;
+    var u=document.getElementById('rk-user');
+    if(!u){u=document.createElement('div');u.id='rk-user';r.appendChild(u);}
+    return u;
+  }
+  window.rkPaintTop=function(me){
+    if(!me)return; lastMe=me;
+    var u=host(); if(!u)return;
+    var g=me.google, name=(g&&g.name)||me.username||'User', role=cap(me.role);
+    var sub=g?(role+' · '+g.email):(role+(me.username?' · @'+me.username:''));
+    var av=(g&&g.picture)?'<img class="rk-av" src="'+esc(g.picture)+'" referrerpolicy="no-referrer" alt="">'
+                         :'<span class="rk-av">'+esc(name.charAt(0).toUpperCase())+'</span>';
+    var badge=g?'<span class="rk-gbadge">'+(typeof GSVG!=='undefined'?GSVG:'')+'</span>':'<span class="rk-dot"></span>';
+    u.innerHTML=(g?'':'<div id="rk-top-g" class="rk-top-g" title="Connect your Google account"></div>')+
+      '<button class="rk-chip" id="rk-chip" type="button"><span style="position:relative;display:inline-flex">'+av+badge+'</span>'+
+      '<span class="rk-ct"><b>'+esc(name)+'</b><small>'+esc(sub)+'</small></span>'+
+      '<span class="material-icons-round" style="font-size:18px;color:var(--text3)">expand_more</span></button>'+
+      '<div class="rk-menu" id="rk-menu">'+
+        '<button type="button" data-a="backup"><span class="material-icons-round">cloud_upload</span> Backup to Google Drive</button>'+
+        (g?'<button type="button" data-a="unlink"><span class="material-icons-round">link_off</span> Disconnect Google</button>':'')+
+        '<button type="button" data-a="logout" class="rk-out"><span class="material-icons-round">logout</span> Logout</button>'+
+      '</div>';
+    if(!g && typeof whenGoogle==='function'){
+      whenGoogle(function(){
+        try{google.accounts.id.renderButton(document.getElementById('rk-top-g'),{theme:'outline',size:'medium',shape:'pill',text:'continue_with'});}catch(e){}
+      });
+    }
+    var w=document.getElementById('dash-welcome');
+    if(w)w.textContent='Welcome back, '+name+'. Here\u2019s today\u2019s overview.';
+  };
+  document.addEventListener('click',function(e){
+    var m=document.getElementById('rk-menu'); if(!m)return;
+    var a=e.target.closest&&e.target.closest('#rk-menu [data-a]');
+    if(e.target.closest&&e.target.closest('#rk-chip')){m.classList.toggle('show');return;}
+    m.classList.remove('show');
+    if(!a)return;
+    var k=a.getAttribute('data-a');
+    if(k==='backup'&&window.rkDriveBackup)rkDriveBackup(true);
+    else if(k==='unlink'&&window.rkUnlinkGoogle)rkUnlinkGoogle();
+    else if(k==='logout'&&window.doLogout)doLogout();
+  });
+
+  /* ---------- dashboard: recent list + mini charts (real data only) ---------- */
+  function mini(valId,vals,cls,tips){
+    var el=document.getElementById(valId),card=el&&el.closest('.stat-card'); if(!card||!vals.length)return;
+    var m=card.querySelector('.rk-mini'); if(!m){m=document.createElement('div');card.appendChild(m);}
+    m.className='rk-mini '+(cls||'');
+    var mx=Math.max.apply(null,vals.concat([1]));
+    m.innerHTML=vals.map(function(v,i){return '<i title="'+esc(tips[i])+'" style="height:'+Math.max(12,Math.round(v/mx*100))+'%;animation-delay:'+i*40+'ms"></i>'}).join('');
+  }
+  function dashPatch(){
+    var h1=document.querySelector('#sec-dashboard .page-header h1');
+    if(h1&&h1.textContent.indexOf('Dashboard')>-1&&h1.textContent!=='Dashboard')h1.textContent='Dashboard';
+    var meds=window.meds||[],hist=window.hist||[],i;
+    /* Medicines: stock level of up to 10 medicines */
+    var ms=meds.slice(0,10); mini('st-tot',ms.map(function(m){return +m.qty||0}),'',ms.map(function(m){return m.name+': '+m.qty}));
+    /* Today: records dispensed per day, last 7 days */
+    var t=new Date();t.setHours(0,0,0,0);var days=[];
+    for(i=6;i>=0;i--){var d=new Date(t);d.setDate(d.getDate()-i);days.push({k:d.toDateString(),v:0,l:d.toLocaleDateString('en-IN',{weekday:'short'})});}
+    hist.forEach(function(x){try{var k=new Date(x.dtRaw).toDateString();days.forEach(function(y){if(y.k===k)y.v++})}catch(e){}});
+    mini('st-today',days.map(function(d){return d.v}),'pink',days.map(function(d){return d.l+': '+d.v+' dispensed'}));
+    /* Recent dispense as a message-style list */
+    var tb=document.getElementById('dash-rec'); if(!tb)return;
+    var table=tb.closest('table'),th=table&&table.querySelector('thead');
+    var rec=hist.slice(0,5); if(!rec.length)return;
+    if(th&&!th.getAttribute('data-rk')){th.setAttribute('data-rk','1');th.innerHTML='<tr><th></th><th>Student</th><th>Medicine</th><th>Qty</th><th>Time</th></tr>';}
+    tb.innerHTML=rec.map(function(x){var n=x.studentName||'?';
+      return '<tr><td><span class="rk-av">'+esc(n.charAt(0).toUpperCase())+'</span></td><td><b>'+esc(n)+'</b></td><td>'+esc(x.medicine)+
+        '</td><td><span class="pw-chip pw-ok"><i></i>\u00d7'+esc(x.qty)+'</span></td><td class="rk-time">'+esc(x.dt||'')+'</td></tr>'}).join('');
+  }
+  var o=window.updateDash;
+  window.updateDash=function(){if(o)o.apply(this,arguments);try{dashPatch()}catch(e){console.error(e)}};
+  /* if the account was painted before this script hooked in, or API is slow, try once more */
+  setTimeout(function(){if(lastMe)window.rkPaintTop(lastMe)},800);
+})();
 </script>
 </body>
 </html>
