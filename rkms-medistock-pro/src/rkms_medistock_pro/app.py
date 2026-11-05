@@ -17,8 +17,8 @@
 
  Default logins (seeded on first run):
    admin  / admin123
-   doctor / doc123
-   nurse  / nurse123
+   staff       / staff123   (Staff Console)
+   medicalward / ward123    (Medical Ward Console)
 
  GOOGLE LOGIN (added):
    POST /auth/google  — "Continue with Google" button.
@@ -382,10 +382,18 @@ def start_session(db: Session, user: User, email: str = "") -> str:
 
 
 def seed_default_users(db: Session):
-    """Matches the hardcoded logins in the original 789.html so nothing breaks for existing users."""
-    defaults = [("admin", "admin123", "admin"), ("doctor", "doc123", "doctor"), ("nurse", "nurse123", "nurse")]
-    for uname, pw, role in defaults:
-        if not db.query(User).filter(User.username == uname).first():
+    """Default logins:  admin / admin123,  staff / staff123 (Staff Console),  medicalward / ward123 (Medical Ward Console).
+    Older 'doctor' and 'nurse' accounts are renamed to 'staff' and 'medicalward' (same roles, new password)."""
+    if not db.query(User).filter(User.username == "admin").first():
+        db.add(User(username="admin", password_hash=hash_password("admin123"), role="admin"))
+    for old_name, uname, pw, role in [("doctor", "staff", "staff123", "doctor"), ("nurse", "medicalward", "ward123", "nurse")]:
+        if db.query(User).filter(User.username == uname).first():
+            continue
+        u = db.query(User).filter(User.username == old_name).first()
+        if u:
+            u.username = uname
+            u.password_hash = hash_password(pw)
+        else:
             db.add(User(username=uname, password_hash=hash_password(pw), role=role))
     db.commit()
 
@@ -529,6 +537,13 @@ def privacy_page():
 
 
 def log_action(db: Session, action: str, user: str = "", type_: str = "success"):
+    # also record the Google e-mail of whoever did it (shown in the Activity Log)
+    try:
+        u = db.query(User).filter(User.username == user).first()
+        if u and u.email and u.email not in user:
+            user = f"{user} <{u.email}>"
+    except Exception:
+        pass
     db.add(ActivityLog(user=user, action=action, type=type_))
     db.commit()
 
