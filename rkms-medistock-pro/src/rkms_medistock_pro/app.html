@@ -1258,6 +1258,30 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
 @keyframes rkc9Spin{to{transform:rotate(360deg)}}@keyframes rkc9RuneOut{to{opacity:0;visibility:hidden}}
 @media(prefers-reduced-motion:reduce){.chat-fab,.rkc-av::before,.rkc-av::after,.rk-eye,.rkc-embers i,.rkc-rune svg{animation:none!important}}
 </style>
+<style id="rk-auth-extra">
+/* ===== Staff registration + admin user management (ported from the Student Conduct app) ===== */
+#loginScreen.rk-reg{align-items:flex-start;overflow-y:auto}
+#loginScreen.rk-reg .login-card{margin:24px auto!important}
+.reg-title{font-size:17px;font-weight:800;color:#0B1F5C;text-align:center;margin:2px 0 2px}
+.reg-sub{font-size:12px;color:#5B6B8C;text-align:center;margin-bottom:14px}
+html body select.login-input{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:38px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path fill='%235B6B8C' d='M7 10l5 5 5-5z'/></svg>")!important;
+  background-repeat:no-repeat!important;background-position:right 14px center!important}
+select.login-input option{color:#0B1F5C;background:#fff}
+.login-ok{display:none;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:#E6F9F1;color:#0F7A4F;font-size:12.5px;font-weight:600;text-align:center}
+.login-switch{text-align:center;font-size:12.5px;color:#5B6B8C;margin-top:2px}
+.login-switch a{color:#0B47E8;font-weight:700;cursor:pointer;text-decoration:none}
+.login-switch a:hover{text-decoration:underline}
+.login-note{text-align:center;font-size:11px;color:#8A9BBF;margin-top:10px}
+.usr-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#EF4444;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center}
+.usr-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;text-transform:capitalize}
+.usr-pill.pending{background:rgba(245,158,11,.16);color:#B45309}
+.usr-pill.approved{background:rgba(16,185,129,.16);color:#047857}
+.usr-pill.rejected{background:rgba(239,68,68,.16);color:#B91C1C}
+.usr-empty{padding:18px;text-align:center;color:var(--text3,#8a94a6);font-size:13px}
+.usr-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.usr-act select{padding:5px 8px;border-radius:8px;border:1px solid var(--border2,#d6dbe6);background:var(--surface,#fff);color:inherit;font-size:12px}
+</style>
 </head>
 <body>
 
@@ -1273,15 +1297,44 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
     <div class="login-title">RKMS MediStock Pro</div>
     <div class="login-sub">Ramakrishna Mission Health Center</div>
     <div id="lout-msg" style="display:none;margin:0 0 12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:600;text-align:center"><span class="material-icons-round" style="font-size:15px;vertical-align:middle">check_circle</span> You are logged out. Please sign in again to continue.</div>
+    <div id="loginForm">
     <div class="role-tabs">
       <button class="role-tab active" onclick="setRole('admin',this)"><span class="material-icons-round" style="font-size:14px">shield</span> Admin</button>
       <button class="role-tab" onclick="setRole('doctor',this)"><span class="material-icons-round" style="font-size:14px">medical_services</span> Staff Console</button>
       <button class="role-tab" onclick="setRole('nurse',this)"><span class="material-icons-round" style="font-size:14px">medication</span> Medical Ward Console</button>
     </div>
-    <input class="login-input" type="text" id="lu" placeholder="Username" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <input class="login-input" type="text" id="lu" placeholder="Username / Email" autocomplete="off" autocapitalize="none" spellcheck="false">
     <input class="login-input" type="password" id="lp" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="lerr"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">error</span> Wrong username or password!</div>
     <button class="login-btn" onclick="doLogin()"><span class="material-icons-round" style="font-size:18px">lock</span> Login to RKMS</button>
+    <div class="login-switch">New faculty / staff? <a onclick="rkShowRegister()">Register here</a></div>
+    </div>
+    <div id="regForm" style="display:none">
+      <div class="reg-title">Staff Registration</div>
+      <div class="reg-sub">Request access to MediStock Pro</div>
+      <input class="login-input" type="text" id="rg-name" placeholder="Full Name *" autocomplete="off">
+      <input class="login-input" type="text" id="rg-user" placeholder="Choose a username *" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input class="login-input" type="email" id="rg-email" placeholder="Email (optional)" autocomplete="off">
+      <select class="login-input" id="rg-role">
+        <option value="doctor">Staff Console</option>
+        <option value="nurse">Medical Ward Console</option>
+      </select>
+      <select class="login-input" id="rg-dept">
+        <option value="">Department — select</option>
+        <option>Mechanical (DME)</option>
+        <option>Automobile (DAE)</option>
+        <option>Computer (DCE)</option>
+        <option>Common / Other</option>
+      </select>
+      <input class="login-input" type="text" id="rg-desig" placeholder="Designation (e.g. Class Teacher, Mentor, HOD)" autocomplete="off">
+      <input class="login-input" type="password" id="rg-pass" placeholder="Password * (min 6 characters)" autocomplete="new-password">
+      <input class="login-input" type="password" id="rg-pass2" placeholder="Confirm Password *" autocomplete="new-password" onkeydown="if(event.key==='Enter')rkRegister()">
+      <div class="login-err" id="rg-err"></div>
+      <div class="login-ok" id="rg-ok"></div>
+      <button class="login-btn" id="rg-btn" onclick="rkRegister()"><span class="material-icons-round" style="font-size:18px">how_to_reg</span> Submit Registration</button>
+      <div class="login-switch">Already registered? <a onclick="rkShowLogin()">Login here</a></div>
+      <div class="login-note">Registration requires Admin approval before login.</div>
+    </div>
   </div>
 </div>
 
@@ -1323,6 +1376,7 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
     <button class="nav-item" onclick="showTab('birthdays')" id="tab-birthdays"><span class="material-icons-round">cake</span> Birthdays</button>
     <button class="nav-item" onclick="showTab('noticeboard')" id="tab-noticeboard"><span class="material-icons-round">push_pin</span> Notice Board</button>
     <button class="nav-item" onclick="showTab('actlog')" id="tab-actlog"><span class="material-icons-round">article</span> Activity Log</button>
+    <button class="nav-item" onclick="showTab('users')" id="tab-users"><span class="material-icons-round">manage_accounts</span> Users <span id="users-badge" class="usr-badge" style="display:none">0</span></button>
   </nav>
 
   <div class="sidebar-footer">
@@ -1599,6 +1653,17 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
   <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">article</span> Log</div><button class="mbtn danger sm" onclick="clearLog()"><span class="material-icons-round">delete</span> Clear</button></div><div class="mcard-body" id="log-body"></div></div>
 </div>
 
+<!-- ====== USER MANAGEMENT (admin) ====== -->
+<div class="page-section" id="sec-users">
+  <div class="page-header"><h1>🔐 User Management</h1><p>Approve staff registrations and manage logins</p></div>
+  <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">pending_actions</span> Pending Approvals</div><button class="mbtn sm" onclick="rkRenderUsers()"><span class="material-icons-round">refresh</span> Refresh</button></div>
+    <div class="table-wrap" id="usr-pending"></div>
+  </div>
+  <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">groups</span> All Users</div><button class="mbtn danger sm" onclick="rkUsrResetAll()"><span class="material-icons-round">person_remove</span> Reset users</button></div>
+    <div class="table-wrap" id="usr-all"></div>
+  </div>
+</div>
+
 </div><!-- end content-area -->
 </div><!-- end main-content -->
 </div><!-- end app-wrap -->
@@ -1691,7 +1756,7 @@ var meds=[],stus=[],hist=[],log=[],docs=[],notices=[],medRows=[];
 var editMedId=null,restockId=null,editStuId=null,selStu=null,catFilter='All';
 var dark=false,adminPW='admin123',selRole='admin',curProfileId=null,currentTab='dashboard';
 var ROLE_TABS={
-  admin:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard','actlog'],
+  admin:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard','actlog','users'],
   doctor:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard'],
   nurse:['dashboard','medicines','students','dispense','prescription','history','daily','calendar','birthdays','noticeboard'],
   staff:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard','actlog']
@@ -1785,8 +1850,8 @@ function applyLogo(url){
 }
 function uploadLogo(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){var url=e.target.result;localStorage.setItem('ms_logo',url);applyLogo(url);};r.readAsDataURL(f);}
 function saveSettings(){var cn=document.getElementById('set-college').value.trim();if(cn){localStorage.setItem('ms_college',cn);document.getElementById('cn-display').textContent=cn;}var gd=document.getElementById('set-gdrive').value.trim();if(gd){localStorage.setItem('ms_gdrive',gd);document.getElementById('gdrive-top-link').href=gd;document.getElementById('gdrive-btn').href=gd;}var cur=document.getElementById('pw-cur').value,nw=document.getElementById('pw-new').value,cn2=document.getElementById('pw-con').value,err=document.getElementById('pw-err');if(nw){if(cur!==adminPW){err.style.display='block';err.textContent='Wrong current password';return;}if(nw.length<4){err.style.display='block';err.textContent='Min 4 chars';return;}if(nw!==cn2){err.style.display='block';err.textContent='Passwords do not match';return;}adminPW=nw;localStorage.setItem('ms_pw',nw);err.style.display='none';alert('✅ Password updated!');}closeModal('settings-modal');addLog('Settings saved');}
-var TABS={dashboard:'Dashboard',medicines:'Medicines',doctors:'Doctors',students:'Students',dispense:'Dispense Medicine',prescription:'Prescription',history:'Dispense History',daily:'Daily Report',analytics:'Analytics',stockval:'Stock Value',calendar:'Calendar View',birthdays:'Birthdays',noticeboard:'Notice Board',actlog:'Activity Log'};
-var ICONS={dashboard:'dashboard',medicines:'medication',doctors:'medical_services',students:'groups',dispense:'assignment',prescription:'description',history:'history',daily:'today',analytics:'bar_chart',stockval:'currency_rupee',calendar:'calendar_month',birthdays:'cake',noticeboard:'push_pin',actlog:'article'};
+var TABS={dashboard:'Dashboard',medicines:'Medicines',doctors:'Doctors',students:'Students',dispense:'Dispense Medicine',prescription:'Prescription',history:'Dispense History',daily:'Daily Report',analytics:'Analytics',stockval:'Stock Value',calendar:'Calendar View',birthdays:'Birthdays',noticeboard:'Notice Board',actlog:'Activity Log',users:'User Management'};
+var ICONS={dashboard:'dashboard',medicines:'medication',doctors:'medical_services',students:'groups',dispense:'assignment',prescription:'description',history:'history',daily:'today',analytics:'bar_chart',stockval:'currency_rupee',calendar:'calendar_month',birthdays:'cake',noticeboard:'push_pin',actlog:'article',users:'manage_accounts'};
 function showTab(t){
   var allowed=ROLE_TABS[selRole]||ROLE_TABS.admin;
   if(allowed.indexOf(t)===-1){
@@ -1813,6 +1878,7 @@ function showTab(t){
   if(t==='birthdays')renderBirthdays();
   if(t==='noticeboard')renderNotices();
   if(t==='actlog')renderLog();
+  if(t==='users'&&window.rkRenderUsers)window.rkRenderUsers();
   if(t==='dispense'){updateDMed();updateDDoc();initMedRows();}
 }
 function openModal(id){document.getElementById(id).classList.add('show');}
@@ -5287,6 +5353,102 @@ window.onGoogleLogin = async function(resp){
     e.textContent=err.message||'Google login failed'; e.style.display='block';
   }
 };
+// ---------- staff registration + admin user management (ported from the Student Conduct app) ----------
+function $id(i){return document.getElementById(i)}
+function rgVal(i){return ($id(i).value||'').trim()}
+window.rkShowRegister=function(){
+  $id('loginForm').style.display='none'; $id('regForm').style.display='block';
+  $id('rg-err').style.display='none'; $id('rg-ok').style.display='none';
+  var lm=$id('lout-msg'); if(lm)lm.style.display='none';
+  var ls=$id('loginScreen'); ls.classList.add('rk-reg'); ls.scrollTop=0;
+};
+window.rkShowLogin=function(){
+  $id('regForm').style.display='none'; $id('loginForm').style.display='block';
+  $id('lerr').style.display='none';
+  var ls=$id('loginScreen'); ls.classList.remove('rk-reg'); ls.scrollTop=0;
+};
+window.rkRegister=async function(){
+  var err=$id('rg-err'), ok=$id('rg-ok'), btn=$id('rg-btn');
+  err.style.display='none'; ok.style.display='none';
+  function fail(m){err.textContent=m; err.style.display='block';}
+  var name=rgVal('rg-name'), user=rgVal('rg-user'), p1=$id('rg-pass').value, p2=$id('rg-pass2').value;
+  if(!name||!user||!p1){fail('Name, Username and Password are required');return;}
+  if(p1.length<6){fail('Password must be at least 6 characters');return;}
+  if(p1!==p2){fail('Passwords do not match');return;}
+  btn.disabled=true;
+  try{
+    var res=await fetch(API_BASE+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:name,username:user,email:rgVal('rg-email'),dept:$id('rg-dept').value,designation:rgVal('rg-desig'),role:$id('rg-role').value,password:p1})});
+    var j={}; try{j=await res.json();}catch(_){}
+    if(!res.ok){
+      var d=j.detail; if(Array.isArray(d))d=d.map(function(x){return x.msg}).join(', ');
+      fail(typeof d==='string'&&d?d:'Registration failed ('+res.status+')'); return;
+    }
+    ok.textContent=j.message||'Registration submitted! Wait for Admin approval, then login.'; ok.style.display='block';
+    ['rg-name','rg-user','rg-email','rg-desig','rg-pass','rg-pass2'].forEach(function(id){$id(id).value=''});
+    $id('rg-dept').value='';
+  }catch(e){ fail('Cannot reach server. Is the backend running?'); }
+  finally{ btn.disabled=false; }
+};
+
+var usrCache=[];
+function setUsersBadge(n){var b=$id('users-badge'); if(!b)return; b.textContent=n; b.style.display=n>0?'inline-flex':'none';}
+window.rkPendingBadge=function(me){ if(me&&me.role==='admin'&&typeof me.pending_users==='number')setUsersBadge(me.pending_users); };
+function rkRefreshPending(){ if(!authToken)return; apiGet('/auth/me').then(window.rkPendingBadge).catch(function(){}); }
+var _ara=window.applyRoleAccess;
+window.applyRoleAccess=function(role){
+  var r=_ara.apply(this,arguments);
+  if(role==='admin'){ rkRefreshPending(); if(!window.__rkPendTimer)window.__rkPendTimer=setInterval(function(){ if(authToken&&selRole==='admin')rkRefreshPending(); },120000); }
+  return r;
+};
+var ROLE_NAME={admin:'Admin',doctor:'Staff Console',nurse:'Medical Ward Console'};
+function usrDate(iso){try{return new Date(iso).toLocaleDateString('en-IN')}catch(e){return ''}}
+window.rkRenderUsers=async function(){
+  var pe=$id('usr-pending'), ae=$id('usr-all'); if(!pe||!ae)return;
+  try{ usrCache=await apiGet('/auth/users'); }
+  catch(e){ pe.innerHTML='<div class="usr-empty">'+esc2(e.message)+'</div>'; ae.innerHTML=''; return; }
+  var pend=usrCache.filter(function(u){return u.status==='pending'});
+  setUsersBadge(pend.length);
+  if(!pend.length){ pe.innerHTML='<div class="usr-empty">No pending registrations</div>'; }
+  else{
+    pe.innerHTML='<table class="mtable"><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Dept</th><th>Designation</th><th>Requested</th><th>Action</th></tr></thead><tbody>'+
+      pend.map(function(u){var id=Number(u.id);
+        return '<tr><td>'+esc2(u.name)+'</td><td>'+esc2(u.username)+'</td><td>'+esc2(u.email||'—')+'</td><td>'+esc2(u.dept||'—')+'</td><td>'+esc2(u.designation||'—')+'</td>'+
+          '<td>'+esc2(usrDate(u.created_at))+'</td><td><div class="usr-act">'+
+          '<select id="usr-role-'+id+'"><option value="doctor"'+(u.role==='doctor'?' selected':'')+'>Staff Console</option><option value="nurse"'+(u.role==='nurse'?' selected':'')+'>Medical Ward Console</option></select>'+
+          '<button class="mbtn primary sm" onclick="rkUsrApprove('+id+')">Approve</button><button class="mbtn danger sm" onclick="rkUsrReject('+id+')">Reject</button></div></td></tr>';
+      }).join('')+'</tbody></table>';
+  }
+  ae.innerHTML='<table class="mtable"><thead><tr><th>#</th><th>Name</th><th>Username</th><th>Role</th><th>Dept</th><th>Status</th><th>Action</th></tr></thead><tbody>'+
+    usrCache.map(function(u,i){var id=Number(u.id), owner=u.username==='admin';
+      return '<tr><td>'+(i+1)+'</td><td>'+esc2(u.name)+(u.google?' <span title="Google connected" style="font-size:11px;opacity:.7">· G</span>':'')+'</td><td>'+esc2(u.username)+'</td><td>'+esc2(ROLE_NAME[u.role]||u.role)+'</td><td>'+esc2(u.dept||'—')+'</td>'+
+        '<td><span class="usr-pill '+esc2(u.status)+'">'+esc2(u.status)+'</span></td><td>'+
+        (owner?'—':'<button class="mbtn danger sm" onclick="rkUsrDelete('+id+')">Remove</button>')+'</td></tr>';
+    }).join('')+'</tbody></table>';
+};
+window.rkUsrApprove=async function(id){
+  var sel=$id('usr-role-'+id);
+  try{ await apiPostJSON('/auth/users/'+id+'/approve', sel?{role:sel.value}:{}); toast('User approved','success'); }
+  catch(e){ toast(e.message||'Could not approve','error'); }
+  window.rkRenderUsers();
+};
+window.rkUsrReject=async function(id){
+  try{ await apiPostJSON('/auth/users/'+id+'/reject',{}); toast('Registration rejected','success'); }
+  catch(e){ toast(e.message||'Could not reject','error'); }
+  window.rkRenderUsers();
+};
+window.rkUsrDelete=async function(id){
+  if(!confirm('Remove this user?'))return;
+  try{ await apiDelete('/auth/users/'+id); toast('User removed','success'); }
+  catch(e){ toast(e.message||'Could not remove','error'); }
+  window.rkRenderUsers();
+};
+window.rkUsrResetAll=async function(){
+  if(!confirm('Remove ALL users except the owner (admin)? This cannot be undone.'))return;
+  try{ var r=await apiPostJSON('/auth/users/reset',{}); toast('Users reset ('+((r&&r.removed)||0)+' removed)','success'); }
+  catch(e){ toast(e.message||'Could not reset users','error'); }
+  window.rkRenderUsers();
+};
 // ---------- session restore + single-login heartbeat + per-user Google Drive backup ----------
 var hbTimer=null, driveTimer=null, driveTok=null, driveExp=0, tokClient=null;
 function jwtSub(){try{return JSON.parse(atob(authToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub}catch(e){return 'user'}}
@@ -5625,15 +5787,23 @@ window.addLog = function(msg,type){
 };
 
 // ---------- Settings: password changes now belong to the backend ----------
-window.saveSettings = function(){
+window.saveSettings = async function(){
   var cn=document.getElementById('set-college').value.trim();
   if(cn){localStorage.setItem('ms_college',cn);document.getElementById('cn-display').textContent=cn;}
   var gd=document.getElementById('set-gdrive').value.trim();
   if(gd){localStorage.setItem('ms_gdrive',gd);document.getElementById('gdrive-top-link').href=gd;document.getElementById('gdrive-btn').href=gd;}
-  var nw=document.getElementById('pw-new').value, err=document.getElementById('pw-err');
-  if(nw){
-    err.style.display='block';
-    err.textContent='User passwords are managed by the backend now — an admin can add/update logins via POST /auth/users (see /docs).';
+  var cur=document.getElementById('pw-cur').value, nw=document.getElementById('pw-new').value, con=document.getElementById('pw-con').value;
+  var err=document.getElementById('pw-err'); err.style.display='none';
+  if(cur||nw||con){
+    var bad=function(m){err.textContent=m;err.style.display='block';};
+    if(!cur||!nw){bad('Enter your current and new password');return;}
+    if(nw.length<6){bad('New password must be at least 6 characters');return;}
+    if(nw!==con){bad('New passwords do not match');return;}
+    try{
+      await apiPostJSON('/auth/change-password',{current_password:cur,new_password:nw});
+      toast('Password updated','success');
+      ['pw-cur','pw-new','pw-con'].forEach(function(id){document.getElementById(id).value='';});
+    }catch(e){bad(e.message||'Could not change password');return;}
   }
   closeModal('settings-modal'); addLog('Settings saved');
 };

@@ -24,6 +24,16 @@
    POST /auth/google/link — "Continue with Google" button on the DASHBOARD (top-right): registers a Google account.
    POST /auth/google      — Google sign-in, allowed ONLY for accounts registered that way.
    GET  /privacy      — privacy policy page (needed by Google Cloud Branding).
+
+ STAFF REGISTRATION + ADMIN APPROVAL (ported from the Student Conduct app):
+   POST /auth/register              — public: new staff request an account (status = pending)
+   POST /auth/login                 — username OR email + password; pending/rejected accounts are refused
+   GET  /auth/users                 — admin: list all users
+   POST /auth/users/{id}/approve    — admin: approve (optionally set role doctor|nurse)
+   POST /auth/users/{id}/reject     — admin: reject / disable
+   DELETE /auth/users/{id}          — admin: remove a user
+   POST /auth/users/reset           — admin: remove every user except the owner ("admin")
+   POST /auth/change-password       — any logged-in user changes their own password
    Optional environment variables (set them in Render > Environment):
      GOOGLE_CLIENT_ID       — OAuth Web client ID (default is already set below)
      GOOGLE_ALLOWED_DOMAINS — e.g. "rkmshome.org"  (empty = ANY Google account)
@@ -126,6 +136,11 @@ class User(Base):
     g_name = Column(String, default="")                     # linked Google profile (shown on dashboard)
     g_picture = Column(String, default="")
     logged_out_at = Column(DateTime)                        # "log out everywhere": tokens issued before this are rejected
+    name = Column(String, default="")                       # full name shown in the app
+    dept = Column(String, default="")
+    designation = Column(String, default="")
+    contact_email = Column(String, default="", index=True)  # e-mail typed at registration (NOT verified - never used to match Google logins)
+    status = Column(String, default="approved")             # pending | approved | rejected
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -216,7 +231,9 @@ def _migrate_user_columns():
     from sqlalchemy import inspect, text
     cols = {c["name"] for c in inspect(engine).get_columns("users")}
     add = {"email": "VARCHAR DEFAULT ''", "session_id": "VARCHAR DEFAULT ''", "session_seen": "TIMESTAMP",
-           "g_name": "VARCHAR DEFAULT ''", "g_picture": "VARCHAR DEFAULT ''", "logged_out_at": "TIMESTAMP"}
+           "g_name": "VARCHAR DEFAULT ''", "g_picture": "VARCHAR DEFAULT ''", "logged_out_at": "TIMESTAMP",
+           "name": "VARCHAR DEFAULT ''", "dept": "VARCHAR DEFAULT ''", "designation": "VARCHAR DEFAULT ''",
+           "contact_email": "VARCHAR DEFAULT ''", "status": "VARCHAR DEFAULT 'approved'"}
     with engine.begin() as conn:
         for name, ddl in add.items():
             if name not in cols:
@@ -333,6 +350,29 @@ class UserCreate(BaseModel):
     username: str
     password: str
     role: str = "nurse"
+    name: Optional[str] = ""
+    dept: Optional[str] = ""
+    designation: Optional[str] = ""
+    email: Optional[str] = ""
+
+
+class RegisterIn(BaseModel):
+    name: str
+    username: str
+    password: str
+    email: Optional[str] = ""
+    dept: Optional[str] = ""
+    designation: Optional[str] = ""
+    role: Optional[str] = "doctor"      # requested console: doctor (Staff Console) | nurse (Medical Ward Console)
+
+
+class ApproveIn(BaseModel):
+    role: Optional[str] = None          # admin may change doctor <-> nurse while approving
+
+
+class ChangePasswordIn(BaseModel):
+    current_password: str
+    new_password: str
 
 
 class Token(BaseModel):
@@ -384,19 +424,57 @@ def start_session(db: Session, user: User, email: str = "") -> str:
 
 def seed_default_users(db: Session):
     """Default logins:  admin / admin123,  staff / staff123 (Staff Console),  medicalward / ward123 (Medical Ward Console).
-    Older 'doctor' and 'nurse' accounts are renamed to 'staff' and 'medicalward' (same roles, new password)."""
+    The two console accounts are created ONLY on a brand-new database, so an admin who removes them
+    (or presses 'Reset users') does not get them back with the default password on the next restart.
+    Older 'doctor' and 'nurse' accounts are still renamed to 'staff' and 'medicalward' (same roles, new password)."""
+    fresh = db.query(User).count() == 0
     if not db.query(User).filter(User.username == "admin").first():
-        db.add(User(username="admin", password_hash=hash_password("admin123"), role="admin"))
-    for old_name, uname, pw, role in [("doctor", "staff", "staff123", "doctor"), ("nurse", "medicalward", "ward123", "nurse")]:
+        db.add(User(username="admin", password_hash=hash_password("admin123"), role="admin",
+                    name="System Owner", dept="Administration", designation="Owner / Admin", status="approved"))
+    for old_name, uname, pw, role, disp in [("doctor", "staff", "staff123", "doctor", "Staff Console"),
+                                            ("nurse", "medicalward", "ward123", "nurse", "Medical Ward Console")]:
         if db.query(User).filter(User.username == uname).first():
             continue
         u = db.query(User).filter(User.username == old_name).first()
         if u:
             u.username = uname
             u.password_hash = hash_password(pw)
-        else:
-            db.add(User(username=uname, password_hash=hash_password(pw), role=role))
+        elif fresh:
+            db.add(User(username=uname, password_hash=hash_password(pw), role=role, name=disp, status="approved"))
     db.commit()
+
+
+OWNER_USERNAME = "admin"
+MAX_PENDING_REGISTRATIONS = 100   # stops the public /auth/register form from being used to flood the database
+
+
+def ensure_approved(user: User):
+    """Registration approval gate (same messages as the Student Conduct app)."""
+    st = (user.status or "approved").lower()
+    if st == "pending":
+        raise HTTPException(status_code=403, detail="Your registration is pending Admin approval")
+    if st == "rejected":
+        raise HTTPException(status_code=403, detail="Your registration was rejected. Contact Admin.")
+
+
+def find_user_for_login(db: Session, ident: str) -> Optional[User]:
+    """Username first; if the text looks like an e-mail, also the registration e-mail or the linked Google e-mail."""
+    ident = (ident or "").strip().lower()
+    if not ident:
+        return None
+    u = db.query(User).filter(func.lower(User.username) == ident).first()
+    if u or "@" not in ident:
+        return u
+    return (db.query(User).filter(func.lower(User.contact_email) == ident).first()
+            or db.query(User).filter(func.lower(User.email) == ident).first())
+
+
+def user_public(u: User) -> dict:
+    return {"id": u.id, "name": u.name or u.username, "username": u.username, "role": u.role,
+            "dept": u.dept or "", "designation": u.designation or "",
+            "email": u.contact_email or u.email or "", "google": bool(u.email),
+            "status": (u.status or "approved").lower(),
+            "created_at": u.created_at.isoformat() if u.created_at else None}
 
 
 def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
@@ -414,6 +492,8 @@ def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session 
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise cred_exc
+    if (user.status or "approved").lower() != "approved":
+        raise HTTPException(status_code=401, detail="Account is not active", headers={"WWW-Authenticate": "Bearer"})
     if user.logged_out_at is not None and int(payload.get("iat", 0)) < calendar.timegm(user.logged_out_at.utctimetuple()):
         raise HTTPException(status_code=401, detail="Logged out from all devices",
                             headers={"WWW-Authenticate": "Bearer"})
@@ -569,9 +649,10 @@ def medicine_status(m: Medicine) -> str:
 # ================================================================
 @app.post("/auth/login", response_model=Token, tags=["Auth"])
 def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == form.username.lower()).first()
+    user = find_user_for_login(db, form.username)
     if not user or not verify_password(form.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Wrong username or password!")
+    ensure_approved(user)
     sid = start_session(db, user)
     token = create_access_token({"sub": user.username, "role": user.role, "sid": sid})
     log_action(db, f"{user.role} logged in", user.username, "info")
@@ -598,6 +679,7 @@ def google_login(payload: GoogleLogin, db: Session = Depends(get_db)):
     wanted = (payload.role or "").lower()
     user = next((u for u in matches if u.role == wanted), matches[0])   # the role is the registered one, never a self-chosen one
 
+    ensure_approved(user)
     user.g_name = info.get("name") or user.g_name or ""
     user.g_picture = info.get("picture") or user.g_picture or ""
     sid = start_session(db, user, email)
@@ -609,21 +691,139 @@ def google_login(payload: GoogleLogin, db: Session = Depends(get_db)):
 @app.post("/auth/users", tags=["Auth"])
 def create_user(payload: UserCreate, db: Session = Depends(get_db),
                  current: User = Depends(require_role("admin"))):
-    if db.query(User).filter(User.username == payload.username.lower()).first():
+    if payload.role not in ("admin", "doctor", "nurse"):
+        raise HTTPException(400, "Role must be admin, doctor or nurse")
+    if db.query(User).filter(func.lower(User.username) == payload.username.strip().lower()).first():
         raise HTTPException(400, "Username already exists")
-    u = User(username=payload.username.lower(), password_hash=hash_password(payload.password), role=payload.role)
+    u = User(username=payload.username.strip().lower(), password_hash=hash_password(payload.password), role=payload.role,
+             name=(payload.name or "").strip(), dept=payload.dept or "", designation=payload.designation or "",
+             contact_email=(payload.email or "").strip().lower(), status="approved")
     db.add(u)
     db.commit()
     log_action(db, f"New user created: {u.username} ({u.role})", current.username, "info")
     return {"ok": True, "id": u.id}
 
 
+@app.post("/auth/register", tags=["Auth"])
+def register(payload: RegisterIn, db: Session = Depends(get_db)):
+    """Public self-registration for new faculty / staff. The account stays 'pending' (cannot log in)
+    until an Admin approves it. Admin can never be requested here."""
+    name = (payload.name or "").strip()[:100]
+    username = (payload.username or "").strip().lower()
+    email = (payload.email or "").strip().lower()[:120]
+    if not name or not username or not payload.password:
+        raise HTTPException(400, "Name, Username and Password are required")
+    if len(payload.password) < 6:
+        raise HTTPException(400, "Password must be at least 6 characters")
+    if len(username) > 40 or "@" in username or any(ch.isspace() for ch in username):
+        raise HTTPException(400, "Username can't contain spaces or '@' (max 40 characters)")
+    if email and ("@" not in email or "." not in email.split("@")[-1]):
+        raise HTTPException(400, "Enter a valid email address or leave it blank")
+    if db.query(User).filter(func.lower(User.username) == username).first():
+        raise HTTPException(400, "Username already exists")
+    if email and (db.query(User).filter(func.lower(User.contact_email) == email).first()
+                  or db.query(User).filter(func.lower(User.email) == email).first()):
+        raise HTTPException(400, "This email is already registered")
+    if db.query(User).filter(User.status == "pending").count() >= MAX_PENDING_REGISTRATIONS:
+        raise HTTPException(429, "Too many registrations are waiting for approval. Please contact the Admin.")
+    role = (payload.role or "doctor").lower()
+    if role not in ("doctor", "nurse"):
+        role = "doctor"
+    u = User(username=username, password_hash=hash_password(payload.password), role=role, name=name,
+             dept=(payload.dept or "")[:60], designation=(payload.designation or "").strip()[:80],
+             contact_email=email, status="pending")
+    db.add(u)
+    db.commit()
+    log_action(db, f"Registration request: {name} ({username}) - waiting for approval", username, "info")
+    return {"ok": True, "message": "Registration submitted! Wait for Admin approval, then login."}
+
+
+@app.get("/auth/users", tags=["Auth"])
+def list_users(db: Session = Depends(get_db), current: User = Depends(require_role("admin"))):
+    rows = db.query(User).order_by(User.created_at.desc()).all()
+    out = [user_public(u) for u in rows]
+    order = {"pending": 0, "approved": 1, "rejected": 2}
+    out.sort(key=lambda x: order.get(x["status"], 3))   # stable: newest first inside each group
+    return out
+
+
+def _target_user(db: Session, user_id: int) -> User:
+    u = db.query(User).get(user_id)
+    if not u:
+        raise HTTPException(404, "User not found")
+    return u
+
+
+@app.post("/auth/users/{user_id}/approve", tags=["Auth"])
+def approve_user(user_id: int, payload: Optional[ApproveIn] = None, db: Session = Depends(get_db),
+                 current: User = Depends(require_role("admin"))):
+    u = _target_user(db, user_id)
+    if payload and payload.role:
+        if payload.role not in ("doctor", "nurse"):
+            raise HTTPException(400, "Role must be doctor or nurse")
+        if u.role != "admin":
+            u.role = payload.role
+    u.status = "approved"
+    db.commit()
+    log_action(db, f"User approved: {u.username} ({u.role})", current.username, "info")
+    return {"ok": True}
+
+
+@app.post("/auth/users/{user_id}/reject", tags=["Auth"])
+def reject_user(user_id: int, db: Session = Depends(get_db), current: User = Depends(require_role("admin"))):
+    u = _target_user(db, user_id)
+    if u.username == OWNER_USERNAME or u.id == current.id:
+        raise HTTPException(400, "The owner / your own account can't be rejected")
+    u.status = "rejected"
+    db.commit()
+    log_action(db, f"User rejected: {u.username}", current.username, "danger")
+    return {"ok": True}
+
+
+@app.post("/auth/users/reset", tags=["Auth"])
+def reset_users(db: Session = Depends(get_db), current: User = Depends(require_role("admin"))):
+    """Removes every user except the owner ('admin') and the admin pressing the button."""
+    n = (db.query(User).filter(User.username != OWNER_USERNAME, User.id != current.id)
+         .delete(synchronize_session=False))
+    db.commit()
+    log_action(db, f"All users reset ({n} removed, owner kept)", current.username, "danger")
+    return {"ok": True, "removed": n}
+
+
+@app.delete("/auth/users/{user_id}", tags=["Auth"])
+def delete_user(user_id: int, db: Session = Depends(get_db), current: User = Depends(require_role("admin"))):
+    u = _target_user(db, user_id)
+    if u.username == OWNER_USERNAME or u.id == current.id:
+        raise HTTPException(400, "The owner / your own account can't be removed")
+    name = u.username
+    db.delete(u)
+    db.commit()
+    log_action(db, f"User removed: {name}", current.username, "danger")
+    return {"ok": True}
+
+
+@app.post("/auth/change-password", tags=["Auth"])
+def change_password(payload: ChangePasswordIn, db: Session = Depends(get_db), current: User = Depends(get_current_user)):
+    if not verify_password(payload.current_password, current.password_hash):
+        raise HTTPException(400, "Current password is wrong")
+    if len(payload.new_password) < 6:
+        raise HTTPException(400, "New password must be at least 6 characters")
+    current.password_hash = hash_password(payload.new_password)
+    db.commit()
+    log_action(db, "Password changed", current.username, "info")
+    return {"ok": True}
+
+
 @app.get("/auth/me", tags=["Auth"])
-def me(current: User = Depends(get_current_user)):
+def me(current: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Also used as the heartbeat + 'restore my session after refresh' call."""
-    return {"username": current.username, "role": current.role, "email": current.email or "",
-            "google": {"email": current.email or "", "name": current.g_name or "", "picture": current.g_picture or ""}
-                      if current.email else None}
+    out = {"username": current.username, "role": current.role, "email": current.email or "",
+           "name": current.name or current.username, "dept": current.dept or "", "designation": current.designation or "",
+           "google": {"email": current.email or "", "name": current.g_name or "", "picture": current.g_picture or ""}
+                     if current.email else None}
+    if current.role == "admin":
+        out["pending_users"] = db.query(User).filter(User.status == "pending").count()
+    return out
 
 
 @app.post("/auth/google/link", tags=["Auth"])
