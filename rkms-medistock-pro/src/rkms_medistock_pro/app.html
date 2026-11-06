@@ -1201,11 +1201,6 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
     <input class="login-input" type="password" id="lp" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="lerr"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">error</span> Wrong username or password!</div>
     <button class="login-btn" onclick="doLogin()"><span class="material-icons-round" style="font-size:18px">lock</span> Login to RKMS</button>
-    <div id="g-wrap" style="display:none">
-      <div style="text-align:center;margin:12px 0 8px;color:rgba(255,255,255,.6);font-size:12px">Role select pannitu, Google la login pannu</div>
-      <div id="g_id_btn" style="display:flex;justify-content:center"></div>
-      <div class="login-err" id="gerr" style="text-align:center;margin-top:8px"></div>
-    </div>
   </div>
 </div>
 
@@ -1667,6 +1662,7 @@ function doLogin(){
 var GOOGLE_CLIENT_ID='537417539303-r2oipsrkqcjuggbfgh4launrv0tq8g5r.apps.googleusercontent.com';
 // Google login: token backend (/auth/google) la verify aagum. onGoogleLogin keezha backend script kulla irukku.
 window.addEventListener('load',function(){
+  return; // Google button is no longer on the login page; it now lives in the dashboard top-right corner
   if(GOOGLE_CLIENT_ID.indexOf('PASTE_')===0)return; // Client ID illana button kaattaadhu
   var n=0,t=setInterval(function(){
     if(window.google&&google.accounts){
@@ -5190,7 +5186,7 @@ window.doLogin = async function(){
   }
 };
 window.onGoogleLogin = async function(resp){
-  var e=document.getElementById('gerr'); e.style.display='none';
+  var e=document.getElementById('gerr')||document.createElement('div'); e.style.display='none';
   try{
     var res=await fetch(API_BASE+'/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:resp.credential,role:selRole})});
     if(!res.ok){
@@ -6756,6 +6752,759 @@ html body .role-tab.active{box-shadow:0 6px 16px rgba(11,71,232,.35)!important}
   }
   if(document.readyState==='complete')start();else addEventListener('load',start);
 })();
+</script>
+
+<!-- ===== RKMS Report Canvas UI (post-login only) ===== -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="rkp-css">
+/* =====================================================================
+   RKMS MediStock Pro — "Report Canvas" UI (post-login only)
+   Everything below is scoped to body.rkp, which is switched on ONLY while
+   the main app is visible. The login screen, the opening splash and the
+   loading animation are not touched by any rule in this block.
+   ===================================================================== */
+body.rkp{
+  --bg:#E8ECF2;--surface:#FFFFFF;--surface2:#F5F7FA;--surface3:#EBEFF4;
+  --text:#172033;--text2:#4A5568;--text3:#748094;
+  --border:#DCE1E9;--border2:#C8CFDA;
+  --radius:6px;--radius-md:8px;--radius-lg:10px;--radius-xl:12px;
+  --shadow:0 1px 2px rgba(23,32,51,.05);
+  --shadow-md:0 2px 8px rgba(23,32,51,.08);
+  --shadow-lg:0 8px 24px rgba(23,32,51,.12);
+  --sidebar-w:248px;
+  --ink:#111B2E;--ink2:#18253D;
+  --s-ok:#0CA678;--s-low:#F59F00;--s-exp:#E8590C;--s-out:#E03131;--s-dead:#A61E4D;
+}
+body.rkp.dark-mode{
+  --bg:#0C121D;--surface:#151D2C;--surface2:#1B2536;--surface3:#243044;
+  --text:#E8EDF5;--text2:#AAB5C6;--text3:#7F8CA0;
+  --border:#26324A;--border2:#35445F;
+  --ink:#0A101B;--ink2:#121B2C;
+  --shadow:0 1px 2px rgba(0,0,0,.35);--shadow-md:0 2px 8px rgba(0,0,0,.4);--shadow-lg:0 8px 24px rgba(0,0,0,.5);
+}
+html body.rkp{background:var(--bg)!important;color:var(--text)}
+body.rkp *:not(.material-icons-round):not(.material-icons){font-family:'IBM Plex Sans','Inter',system-ui,-apple-system,'Segoe UI',sans-serif}
+body.rkp{font-variant-numeric:tabular-nums}
+
+/* ---------- Sidebar: docked, ink-navy, quiet ---------- */
+html body.rkp .sidebar{background:var(--ink)!important;border:0!important;box-shadow:none!important;color:#fff}
+@media(min-width:901px){
+  html body.rkp .sidebar{left:0!important;top:0!important;height:100vh!important;border-radius:0!important;width:var(--sidebar-w)}
+  html body.rkp .main-content{margin-left:var(--sidebar-w)!important}
+  html body.rkp .topbar{margin:0!important;border-radius:0!important;top:0!important}
+  html body.rkp .content-area{padding:20px 24px 48px!important}
+}
+html body.rkp .sidebar-logo{background:transparent!important;border-bottom:1px solid rgba(255,255,255,.08)!important;padding:16px 16px 14px}
+html body.rkp .sidebar-logo-icon{border-radius:8px!important;background:rgba(255,255,255,.08)!important;box-shadow:none!important}
+html body.rkp .sidebar-brand-name{font-size:14px;font-weight:600;letter-spacing:0;color:#fff}
+html body.rkp .sidebar-brand-sub{font-size:11px;opacity:.55}
+html body.rkp .sidebar-role-badge,html body.rkp .sidebar-role-badge[class]{background:transparent!important;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.8);font-weight:500;font-size:10.5px;padding:1px 8px}
+html body.rkp .sidebar-nav{padding:10px 10px;gap:2px}
+html body.rkp .sidebar .nav-section-label{font-size:11px;font-weight:500;letter-spacing:.01em;text-transform:none;color:rgba(255,255,255,.4)!important;padding:14px 10px 5px}
+html body.rkp .sidebar .nav-item{height:36px;padding:0 10px;border-radius:6px!important;color:rgba(255,255,255,.72)!important;font-size:13px;font-weight:500;background:transparent!important;box-shadow:none!important;transform:none!important}
+html body.rkp .sidebar .nav-item .material-icons-round{color:rgba(255,255,255,.5)!important;font-size:19px}
+html body.rkp .sidebar .nav-item:hover{background:rgba(255,255,255,.06)!important;color:#fff!important}
+html body.rkp .sidebar .nav-item:hover .material-icons-round{color:rgba(255,255,255,.85)!important}
+html body.rkp .sidebar .nav-item.active{background:rgba(255,255,255,.1)!important;color:#fff!important;font-weight:600}
+html body.rkp .sidebar .nav-item.active .material-icons-round{color:#fff!important}
+html body.rkp .sidebar .nav-item.active::before{content:'';position:absolute;left:-10px;top:7px;bottom:7px;width:3px;border-radius:0 3px 3px 0;background:#F2B01E;display:block}
+html body.rkp .sidebar-footer{border-top:1px solid rgba(255,255,255,.08)!important;background:transparent!important;padding:8px 10px}
+html body.rkp .sidebar .footer-btn{color:rgba(255,255,255,.66)!important;border-radius:6px!important;font-size:12.5px;font-weight:500;background:transparent!important}
+html body.rkp .sidebar .footer-btn:hover{background:rgba(255,255,255,.07)!important;color:#fff!important}
+html body.rkp .sidebar .footer-btn[onclick*="doLogout"]{color:#FF9B9B!important}
+html body.rkp .sidebar .footer-btn[onclick*="exportCSV"]{color:rgba(255,255,255,.66)!important}
+
+/* ---------- Topbar ---------- */
+html body.rkp .topbar{background:var(--surface)!important;border-bottom:1px solid var(--border)!important;box-shadow:none!important;height:52px;padding:0 24px}
+html body.rkp .topbar-title{font-size:14px;font-weight:600}
+html body.rkp .topbar-title .material-icons-round{color:var(--text3)}
+html body.rkp .alert-badge{border-radius:6px!important;font-weight:600}
+html body.rkp .clock-widget{border-radius:6px!important;background:var(--surface2)!important;border:1px solid var(--border)}
+
+/* ---------- Generic cards / tables / forms for every other tab ---------- */
+html body.rkp .page-header{margin-bottom:14px}
+html body.rkp .page-header h1{font-size:20px;font-weight:600;letter-spacing:-.01em}
+html body.rkp .page-header p{font-size:13px}
+html body.rkp .mcard,html body.rkp .pw-card{border-radius:8px!important;border:1px solid var(--border)!important;box-shadow:none!important;background:var(--surface)!important}
+html body.rkp .mcard:hover{transform:none;box-shadow:none!important}
+html body.rkp .mcard-head{background:var(--surface)!important;padding:12px 16px}
+html body.rkp .mcard-title{font-size:14px;font-weight:600}
+html body.rkp .mcard-title .material-icons-round{color:var(--text3)}
+html body.rkp .mtable thead th{background:var(--surface2);color:var(--text2);font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;border-bottom:1px solid var(--border);padding:9px 14px}
+html body.rkp .mtable tbody td{padding:10px 14px}
+html body.rkp .mtable tbody tr:hover td{background:var(--surface2)}
+html body.rkp .form-label{font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--text2)}
+html body.rkp .form-control-m,html body.rkp .search-input{border:1px solid var(--border2);border-radius:6px;padding:9px 12px;font-size:13px;background:var(--surface)}
+html body.rkp .form-control-m:focus,html body.rkp .search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 18%,transparent)}
+html body.rkp .mbtn{border-radius:6px;border:1px solid var(--border2);font-weight:600;box-shadow:none}
+html body.rkp .mbtn:hover{transform:none}
+html body.rkp .mbtn.primary{background:var(--primary);border-color:var(--primary);box-shadow:none}
+html body.rkp .mbtn.primary:hover{filter:brightness(1.06);box-shadow:none}
+html body.rkp .fpill{border-radius:6px}
+html body.rkp .mbadge{border-radius:5px;font-weight:600}
+html body.rkp .modal-box{border-radius:12px;box-shadow:var(--shadow-lg)}
+html body.rkp :focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+/* ---------- Dashboard section: report canvas ---------- */
+html body.rkp #sec-dashboard.active{display:flex;flex-direction:column;gap:0;animation:none}
+html body.rkp #sec-dashboard>.page-header,
+html body.rkp #sec-dashboard>.stats-grid,
+html body.rkp #sec-dashboard>#pharm-widgets,
+html body.rkp #sec-dashboard>#rk-cat,
+html body.rkp #sec-dashboard>.row{display:none!important}
+html body.rkp #rkp-dash{order:1}
+html body.rkp #sec-dashboard>#g-account-card{order:5;margin:16px 0 0;border-radius:8px;box-shadow:none;border:1px solid var(--border);padding:10px 14px}
+html body.rkp #sec-dashboard>.gdrive-banner{order:6;margin:10px 0 0;border-radius:8px;box-shadow:none;padding:10px 14px}
+html body.rkp #sec-dashboard>.gdrive-banner .material-icons-round:first-child{font-size:22px!important}
+
+#rkp-dash{display:flex;flex-direction:column;gap:14px;min-width:0}
+.rkp-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rkp-head h2{font-size:22px;font-weight:600;letter-spacing:-.015em;line-height:1.2;color:var(--text)}
+.rkp-head p{font-size:13px;color:var(--text3);margin-top:3px}
+.rkp-actions{display:flex;gap:6px;align-items:center}
+.rkp-ibtn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer}
+.rkp-ibtn:hover{background:var(--surface3);color:var(--text)}
+.rkp-ibtn .material-icons-round{font-size:17px}
+
+/* slicer bar */
+.rkp-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;position:sticky;top:52px;z-index:20}
+.rkp-seg{display:inline-flex;background:var(--surface3);border-radius:6px;padding:2px}
+.rkp-seg button{border:0;background:transparent;color:var(--text2);font-size:12.5px;font-weight:500;height:28px;padding:0 12px;border-radius:5px;cursor:pointer}
+.rkp-seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(23,32,51,.15)}
+.rkp-sel{height:32px;border:1px solid var(--border2);background:var(--surface);color:var(--text);border-radius:6px;padding:0 28px 0 10px;font-size:12.5px;max-width:190px}
+.rkp-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rkp-chip{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 6px 0 10px;border-radius:13px;background:color-mix(in srgb,var(--primary) 12%,var(--surface));color:var(--text);border:1px solid color-mix(in srgb,var(--primary) 35%,transparent);font-size:12px;font-weight:500;cursor:pointer}
+.rkp-chip .material-icons-round{font-size:15px;color:var(--text3)}
+.rkp-chip:hover .material-icons-round{color:var(--text)}
+.rkp-sp{flex:1}
+.rkp-reset{border:0;background:transparent;color:var(--primary);font-size:12.5px;font-weight:600;cursor:pointer;height:28px;padding:0 6px;border-radius:5px}
+.rkp-reset:hover{background:var(--surface3)}
+.rkp-stamp{font-size:12px;color:var(--text3)}
+
+/* narrative */
+.rkp-note{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:8px;background:var(--surface);font-size:13.5px;line-height:1.55;color:var(--text2)}
+.rkp-note .material-icons-round{font-size:19px;color:var(--primary);margin-top:1px}
+.rkp-note b{color:var(--text);font-weight:600}
+
+/* KPI row */
+.rkp-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.rkp-kpi{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px 10px;min-height:104px;display:flex;flex-direction:column;overflow:hidden}
+.rkp-kpi .l{font-size:12.5px;color:var(--text2);font-weight:500;display:flex;align-items:center;gap:6px}
+.rkp-kpi .v{font-size:27px;font-weight:600;letter-spacing:-.02em;line-height:1.15;margin-top:6px;color:var(--text)}
+.rkp-kpi .v small{font-size:13px;font-weight:500;color:var(--text3);letter-spacing:0;margin-left:3px}
+.rkp-kpi .d{font-size:12px;color:var(--text3);margin-top:auto;padding-top:6px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.rkp-kpi .d b{font-weight:600}
+.rkp-kpi .d .up{color:var(--s-ok)}.rkp-kpi .d .dn{color:var(--s-out)}
+.rkp-kpi svg.sp{position:absolute;right:10px;bottom:10px;width:84px;height:30px;opacity:.9}
+.rkp-kpi.risk .v{color:var(--s-out)}
+.rkp-kpi.risk.zero .v{color:var(--s-ok)}
+.rkp-ring{position:absolute;right:12px;top:12px;width:44px;height:44px}
+
+/* tiles */
+.rkp-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
+.rkp-tile{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px 16px;min-width:0;display:flex;flex-direction:column}
+.rkp-tile>header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.rkp-tile h3{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
+.rkp-tile header small{display:block;font-size:12px;color:var(--text3);font-weight:400;margin-top:2px}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.rkp-legend{display:flex;gap:14px;font-size:12px;color:var(--text3);flex-wrap:wrap}
+.rkp-legend i{display:inline-block;width:14px;height:0;border-top:2px solid var(--primary);vertical-align:middle;margin-right:5px}
+.rkp-legend i.dash{border-top:2px dashed #F59F00}
+
+/* trend */
+.rkp-trend{position:relative;min-height:230px}
+.rkp-trend svg{display:block;width:100%;height:230px;overflow:visible}
+.rkp-trend text{fill:var(--text3);font-size:11px}
+.rkp-empty{display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text3);font-size:13px;min-height:140px;padding:12px;line-height:1.5}
+
+/* donut */
+.rkp-donutwrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.rkp-donut{position:relative;width:150px;height:150px;flex:none}
+.rkp-donut svg{width:150px;height:150px}
+.rkp-donut circle.seg{cursor:pointer;transition:opacity .15s,stroke-width .15s}
+.rkp-donut .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.rkp-donut .mid b{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.rkp-donut .mid span{font-size:11.5px;color:var(--text3);margin-top:3px}
+.rkp-lg{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.rkp-lg button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;padding:6px 8px;border-radius:6px;cursor:pointer;color:var(--text2);font-size:12.5px;text-align:left}
+.rkp-lg button:hover{background:var(--surface2)}
+.rkp-lg button[aria-pressed="true"]{background:var(--surface3);color:var(--text);font-weight:600}
+.rkp-lg i{width:10px;height:10px;border-radius:3px;flex:none}
+.rkp-lg span.n{flex:1}.rkp-lg span.c{font-weight:600;color:var(--text)}
+
+/* horizontal bars */
+.rkp-hbs{display:flex;flex-direction:column;gap:2px}
+.rkp-hb{display:grid;grid-template-columns:minmax(70px,34%) 1fr auto;gap:10px;align-items:center;padding:5px 6px;border-radius:6px;cursor:pointer;border:0;background:transparent;width:100%;text-align:left;color:inherit}
+.rkp-hb:hover{background:var(--surface2)}
+.rkp-hb .n{font-size:12.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rkp-hb .b{height:14px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.rkp-hb .b i{display:block;height:100%;background:var(--primary);border-radius:3px;transform-origin:left}
+.rkp-hb .v{font-size:12.5px;font-weight:600;min-width:34px;text-align:right}
+.rkp-hbs.has-sel .rkp-hb:not(.sel) .b i{opacity:.28}
+.rkp-hb.sel{background:var(--surface3)}
+.rkp-anim .rkp-hb .b i,.rkp-anim .rkp-col i{animation:rkpGrow .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rkpGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rkpGrowY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+/* year columns */
+.rkp-cols{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:6px}
+.rkp-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;border:0;background:transparent;cursor:pointer;color:inherit;padding:0 2px;border-radius:6px}
+.rkp-col:hover{background:var(--surface2)}
+.rkp-col .t{flex:1;width:100%;display:flex;align-items:flex-end}
+.rkp-col i{display:block;width:100%;background:var(--primary);border-radius:3px 3px 0 0;transform-origin:bottom;min-height:3px}
+.rkp-anim .rkp-col i{animation-name:rkpGrowY}
+.rkp-col .x{font-size:11.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rkp-col .y{font-size:12px;font-weight:600}
+.rkp-cols.has-sel .rkp-col:not(.sel) i{opacity:.28}
+.rkp-col.sel{background:var(--surface3)}
+
+/* heatmap */
+.rkp-heat{display:flex;gap:8px}
+.rkp-heat .wd{display:grid;grid-template-rows:repeat(7,1fr);font-size:11px;color:var(--text3);padding-top:18px;gap:3px}
+.rkp-heat .wd span{display:flex;align-items:center;line-height:1}
+.rkp-hm{flex:1;min-width:0}
+.rkp-hm .mo{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:3px;height:16px;font-size:11px;color:var(--text3);margin-bottom:2px}
+.rkp-hm .mo span{white-space:nowrap;overflow:visible}
+.rkp-hm .cells{display:grid;grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(7,auto);grid-auto-flow:column;gap:3px}
+.rkp-hm .c{aspect-ratio:1/1;border-radius:3px;background:var(--surface3);min-width:0}
+.rkp-hm .c.on{background:var(--primary);opacity:var(--o,1)}
+.rkp-hm .c.fut{background:transparent}
+.rkp-hm .c.today{outline:1.5px solid var(--text);outline-offset:1px}
+.rkp-hscale{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);justify-content:flex-end;margin-top:8px}
+.rkp-hscale i{width:12px;height:12px;border-radius:3px;background:var(--primary)}
+
+/* treemap */
+.rkp-tm{position:relative;height:230px;border-radius:6px;overflow:hidden;background:var(--surface3)}
+.rkp-tm button{position:absolute;border:2px solid var(--surface);color:#fff;text-align:left;padding:8px 9px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-start;gap:2px;font-size:12px}
+.rkp-tm button b{font-weight:600;font-size:12.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rkp-tm button span{opacity:.9;font-size:11.5px}
+.rkp-tm button:hover{filter:brightness(1.08)}
+.rkp-tm.has-sel button:not(.sel){opacity:.35}
+
+/* runway */
+.rkp-run{display:flex;height:22px;border-radius:5px;overflow:hidden;gap:2px;margin-top:2px}
+.rkp-run button{border:0;color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;min-width:0;padding:0 6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.rkp-runl{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px;color:var(--text2)}
+.rkp-runl span{display:inline-flex;align-items:center;gap:6px}.rkp-runl i{width:9px;height:9px;border-radius:2px}
+
+/* table visual */
+.rkp-tw{overflow-x:auto;margin:0 -16px;padding:0 16px}
+table.rkp-t{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
+.rkp-t th{font-size:12px;font-weight:600;color:var(--text2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border2);background:var(--surface2);white-space:nowrap}
+.rkp-t th button{border:0;background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:2px;padding:0}
+.rkp-t th button .material-icons-round{font-size:15px;opacity:.6}
+.rkp-t td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.rkp-t tbody tr:hover td{background:var(--surface2)}
+.rkp-t td.num,.rkp-t th.num{text-align:right}
+.rkp-t td .nm{font-weight:600;color:var(--text)}.rkp-t td .sb{font-size:11.5px;color:var(--text3)}
+.rkp-db{display:flex;align-items:center;gap:8px;min-width:120px}
+.rkp-db .bar{flex:1;height:8px;border-radius:2px;background:var(--surface3);overflow:hidden}
+.rkp-db .bar i{display:block;height:100%;border-radius:2px}
+.rkp-db b{min-width:30px;text-align:right;font-weight:600}
+.rkp-st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px 2px 7px;border-radius:12px;white-space:nowrap}
+.rkp-st i{width:7px;height:7px;border-radius:50%}
+.rkp-rs{border:1px solid var(--border2);background:var(--surface);color:var(--text);border-radius:6px;font-size:12px;font-weight:600;height:26px;padding:0 10px;cursor:pointer}
+.rkp-rs:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.rkp-more{align-self:flex-start;margin-top:10px;border:0;background:transparent;color:var(--primary);font-weight:600;font-size:12.5px;cursor:pointer;padding:4px 2px}
+
+/* feeds */
+.rkp-feed{display:flex;flex-direction:column}
+.rkp-fi{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.rkp-fi:last-child{border-bottom:0}
+.rkp-av{width:32px;height:32px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+.rkp-fi .m{flex:1;min-width:0}
+.rkp-fi .m b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rkp-fi .m span{display:block;font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rkp-fi .r{font-size:12px;color:var(--text3);white-space:nowrap;text-align:right}
+.rkp-fi .r strong{display:block;color:var(--text);font-size:13px;font-weight:600}
+
+/* tooltip */
+#rkp-tip{position:fixed;z-index:100000;pointer-events:none;background:#0F172A;color:#fff;font-size:12px;line-height:1.45;padding:7px 10px;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.3);max-width:260px;opacity:0;transition:opacity .08s}
+#rkp-tip.on{opacity:1}
+#rkp-tip b{font-weight:600}
+
+/* focus mode */
+body.rkp.rkp-focus .sidebar{display:none}
+body.rkp.rkp-focus .main-content{margin-left:0!important}
+
+/* responsive */
+@media(max-width:1380px){.rkp-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1180px){.s4,.s3{grid-column:span 6}.s5,.s7,.s8{grid-column:span 12}}
+@media(max-width:760px){
+  .rkp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}
+  .rkp-bar{position:static}
+  .rkp-head h2{font-size:19px}
+  .rkp-donutwrap{justify-content:center}
+}
+@media print{.rkp-bar,.rkp-actions,.rkp-rs{display:none!important}.rkp-tile,.rkp-kpi{break-inside:avoid}}
+@media(prefers-reduced-motion:reduce){.rkp-anim .rkp-hb .b i,.rkp-anim .rkp-col i{animation:none}}
+
+</style>
+<script id="rkp-js">
+(function(){
+'use strict';
+/* ---------------------------------------------------------------
+   Report-canvas dashboard. Reads the app's own data (meds, hist,
+   stus) and never writes to it. Wraps updateDash(), so the original
+   behaviour is preserved. No external chart library is needed.
+--------------------------------------------------------------- */
+var app=document.getElementById('app'),sec=document.getElementById('sec-dashboard');
+if(!app||!sec)return;
+
+/* ---- switch the new look on only while the main app is visible ---- */
+function syncShell(){
+  var on=app.style.display!=='none'&&getComputedStyle(app).display!=='none';
+  document.body.classList.toggle('rkp',on);
+}
+new MutationObserver(syncShell).observe(app,{attributes:true,attributeFilter:['style','class']});
+syncShell();
+
+/* ---- state ---- */
+var S={days:30,cat:'',dept:'',med:'',year:'',status:''};
+var T={key:'sev',dir:1,all:false};
+var FIRST=true,LAST=null,SIG='';
+var SW=['var(--primary)','#0CA678','#F59F00','#E8590C','#D6336C','#3B9AE1','#845EF7','#868E96'];
+var ST={
+  expired:{l:'Expired',c:'#A61E4D',o:0},
+  out:{l:'Out of stock',c:'#E03131',o:1},
+  low:{l:'Low stock',c:'#F59F00',o:2},
+  expiring:{l:'Expires within 30 days',c:'#E8590C',o:3},
+  ok:{l:'Healthy',c:'#0CA678',o:4}
+};
+var ROLE={admin:'Admin',doctor:'Staff console',nurse:'Medical ward console',staff:'Staff'};
+
+/* ---- helpers ---- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function p2(n){return('0'+n).slice(-2)}
+function dkey(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+function num(n){return Math.round(+n||0).toLocaleString('en-IN')}
+function inr(v){v=+v||0;if(v>=1e7)return'₹'+(v/1e7).toFixed(2)+' Cr';if(v>=1e5)return'₹'+(v/1e5).toFixed(2)+' L';return'₹'+Math.round(v).toLocaleString('en-IN')}
+function dshort(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}
+function colorFor(s){var h=0;s=String(s);for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return SW[1+h%(SW.length-1)]}
+function initials(n){var p=String(n||'?').trim().split(/\s+/);return((p[0]||'?').charAt(0)+(p.length>1?p[p.length-1].charAt(0):'')).toUpperCase()}
+function ago(d,now){var m=Math.round((now-d)/60000);if(m<1)return'Just now';if(m<60)return m+' min ago';var h=Math.round(m/60);if(h<24)return h+' h ago';var dd=Math.round(h/24);if(dd===1)return'Yesterday';if(dd<7)return dd+' days ago';return dshort(d)}
+function niceMax(v){if(v<=4)return 4;var p=Math.pow(10,Math.floor(Math.log(v)/Math.LN10)),f=v/p;var n=f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10;return n*p}
+function spark(vals,color){
+  var n=vals.length,w=84,h=30,mx=Math.max.apply(null,vals.concat([1]));
+  if(n<2)return'';
+  var pts=vals.map(function(v,i){return(i/(n-1)*w).toFixed(1)+','+(h-2-(v/mx)*(h-6)).toFixed(1)}).join(' ');
+  return'<svg class="sp" viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><polyline points="'+pts+'" fill="none" style="stroke:'+color+'" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+}
+
+/* ---- data model ---- */
+function model(){
+  var meds=window.meds||[],hist=window.hist||[],stus=window.stus||[];
+  var now=new Date(),today=new Date(now);today.setHours(0,0,0,0);
+  var catOf={};meds.forEach(function(m){catOf[m.name]=m.cat||'Uncategorised'});
+  var rows=[];
+  hist.forEach(function(h){
+    var d=new Date(h.dtRaw);if(isNaN(d.getTime()))return;
+    rows.push({d:d,day:dkey(d),q:+h.qty||0,med:h.medicine||'Unknown',cat:catOf[h.medicine]||'Uncategorised',
+      dept:(h.dept&&h.dept!=='—')?h.dept:'Unassigned',year:(h.year&&h.year!=='—')?h.year:'Unassigned',
+      stu:h.stuId,name:h.studentName||'—',doc:h.doctor||''});
+  });
+  var start,prevStart=null,end=new Date(today);end.setDate(end.getDate()+1);
+  if(S.days>0){start=new Date(today);start.setDate(start.getDate()-(S.days-1));prevStart=new Date(start);prevStart.setDate(prevStart.getDate()-S.days)}
+  else{var mn=new Date(today);rows.forEach(function(r){if(r.d<mn)mn=r.d});start=new Date(mn);start.setHours(0,0,0,0)}
+
+  function pass(r,skip){
+    return(skip==='dept'||!S.dept||r.dept===S.dept)&&(skip==='cat'||!S.cat||r.cat===S.cat)&&
+           (skip==='med'||!S.med||r.med===S.med)&&(skip==='year'||!S.year||r.year===S.year);
+  }
+  function inP(r){return r.d>=start&&r.d<end}
+  function inPrev(r){return prevStart&&r.d>=prevStart&&r.d<start}
+
+  /* medicines */
+  var ml=meds.map(function(m){
+    var d=null;if(m.expiry){var x=Math.ceil((new Date(m.expiry)-now)/864e5);if(!isNaN(x))d=x}
+    var q=+m.qty||0,mn2=+m.min||0,s;
+    if(d!==null&&d<=0)s='expired';else if(q===0)s='out';else if(q<=mn2)s='low';else if(d!==null&&d<=30)s='expiring';else s='ok';
+    return{m:m,id:m.id,name:m.name,cat:m.cat||'Uncategorised',batch:m.batch||'',q:q,min:mn2,price:+m.price||0,val:q*(+m.price||0),d:d,s:s};
+  });
+  function mpass(x,skip){return(skip==='cat'||!S.cat||x.cat===S.cat)&&(skip==='med'||!S.med||x.name===S.med)&&(skip==='status'||!S.status||x.s===S.status)}
+
+  /* time buckets */
+  var span=Math.round((today-start)/864e5)+1,weekly=(S.days===0&&span>90);
+  function bkey(d){if(!weekly)return dkey(d);var m=new Date(d);m.setHours(0,0,0,0);m.setDate(m.getDate()-((m.getDay()+6)%7));return dkey(m)}
+  var buckets=[],idx={};
+  for(var dd=new Date(start);dd<end;dd.setDate(dd.getDate()+1)){var k=bkey(dd);if(!(k in idx)){idx[k]=buckets.length;buckets.push({k:k,d:new Date(dd),v:0,vis:{}})}}
+  var cur={u:0,visits:{},stu:{}},prev={u:0,visits:{},stu:{}},hasPrev=!!prevStart;
+  var byMed={},byDept={},byYear={};
+  rows.forEach(function(r){
+    if(inP(r)){
+      if(pass(r)){
+        var b=buckets[idx[bkey(r.d)]];if(b){b.v+=r.q;b.vis[r.stu+'|'+r.day]=1}
+        cur.u+=r.q;cur.visits[r.stu+'|'+r.day]=1;cur.stu[r.stu]=1;
+      }
+      if(pass(r,'med'))byMed[r.med]=(byMed[r.med]||0)+r.q;
+      if(pass(r,'dept'))byDept[r.dept]=(byDept[r.dept]||0)+r.q;
+      if(pass(r,'year'))byYear[r.year]=(byYear[r.year]||0)+r.q;
+    }else if(hasPrev&&inPrev(r)&&pass(r)){prev.u+=r.q;prev.visits[r.stu+'|'+r.day]=1;prev.stu[r.stu]=1}
+  });
+  function top(o,n){return Object.keys(o).map(function(k){return{k:k,v:o[k]}}).sort(function(a,b){return b.v-a.v}).slice(0,n)}
+
+  /* heat map: last 16 weeks (Mon-start) */
+  var cols=16,mon=new Date(today);mon.setDate(mon.getDate()-((mon.getDay()+6)%7)-(cols-1)*7);
+  var heat={},hmax=0;
+  rows.forEach(function(r){if(r.d>=mon&&pass(r)){heat[r.day]=(heat[r.day]||0)+r.q}});
+  Object.keys(heat).forEach(function(k){if(heat[k]>hmax)hmax=heat[k]});
+
+  /* stock aggregates */
+  var cnt={expired:0,out:0,low:0,expiring:0,ok:0},cntAll={expired:0,out:0,low:0,expiring:0,ok:0},value=0,fl=[];
+  ml.forEach(function(x){
+    if(mpass(x,'status'))cntAll[x.s]++;
+    if(mpass(x)){cnt[x.s]++;value+=x.val;fl.push(x)}
+  });
+  var catVal={};ml.forEach(function(x){if(mpass(x,'cat')){catVal[x.cat]=(catVal[x.cat]||0)+x.val}});
+  var runway={expired:0,d30:0,d90:0,d180:0,later:0,none:0};
+  fl.forEach(function(x){
+    if(x.d===null)runway.none++;else if(x.d<=0)runway.expired++;else if(x.d<=30)runway.d30++;else if(x.d<=90)runway.d90++;else if(x.d<=180)runway.d180++;else runway.later++;
+  });
+
+  /* people */
+  var visitsBy={},seenDay={};
+  rows.forEach(function(r){if(inP(r)&&pass(r)){var kk=r.stu+'|'+r.day;if(!seenDay[kk]){seenDay[kk]=1;var o=visitsBy[r.stu]||(visitsBy[r.stu]={n:0,name:r.name});o.n++}}});
+  var freq=Object.keys(visitsBy).map(function(k){return{id:k,n:visitsBy[k].n,name:visitsBy[k].name}}).filter(function(x){return x.n>=2}).sort(function(a,b){return b.n-a.n}).slice(0,5);
+  var recent=rows.filter(function(r){return pass(r)}).sort(function(a,b){return b.d-a.d}).slice(0,7);
+  var bdays=[];
+  stus.forEach(function(s){
+    var mt=/^(\d{4})-(\d{2})-(\d{2})/.exec(s.bday||'');if(!mt)return;
+    var n=new Date(today.getFullYear(),+mt[2]-1,+mt[3]);if(n<today)n.setFullYear(n.getFullYear()+1);
+    var left=Math.round((n-today)/864e5);if(left<=14)bdays.push({name:s.name,dept:s.dept||'',left:left,on:n});
+  });
+  bdays.sort(function(a,b){return a.left-b.left});
+  var depts={};stus.forEach(function(s){if(s.dept)depts[s.dept]=1});rows.forEach(function(r){depts[r.dept]=1});
+  var cats={};meds.forEach(function(m){cats[m.cat||'Uncategorised']=1});
+
+  return{now:now,today:today,start:start,end:end,weekly:weekly,buckets:buckets,hasPrev:hasPrev,
+    cur:{u:cur.u,v:Object.keys(cur.visits).length,s:Object.keys(cur.stu).length},
+    prev:{u:prev.u,v:Object.keys(prev.visits).length,s:Object.keys(prev.stu).length},
+    topMeds:top(byMed,7),topDept:top(byDept,6),years:Object.keys(byYear).sort().map(function(k){return{k:k,v:byYear[k]}}),
+    heat:heat,hmax:hmax,mon:mon,cols:cols,cnt:cnt,cntAll:cntAll,value:value,list:fl,total:fl.length,
+    catVal:Object.keys(catVal).map(function(k){return{k:k,v:catVal[k]}}).filter(function(x){return x.v>0}).sort(function(a,b){return b.v-a.v}),
+    runway:runway,freq:freq,recent:recent,bdays:bdays,studentsTotal:stus.length,
+    deptList:Object.keys(depts).sort(),catList:Object.keys(cats).sort(),medsTotal:meds.length};
+}
+
+/* ---- small renderers ---- */
+function delta(c,p,has){
+  if(!has)return'<span>all recorded time</span>';
+  if(!p&&!c)return'<span>no change</span>';
+  if(!p)return'<span>no data in the previous period</span>';
+  var pc=Math.round((c-p)/p*100);
+  if(pc===0)return'<span>same as previous period</span>';
+  return'<b class="'+(pc>0?'up':'dn')+'">'+(pc>0?'▲ ':'▼ ')+Math.abs(pc)+'%</b><span>vs previous '+S.days+' days</span>';
+}
+function periodWords(){return S.days>0?'in the last '+S.days+' days':'across all recorded time'}
+
+function narrative(M){
+  var out=[],c=M.cur.u;
+  if(c>0){
+    var s='<b>'+num(c)+' units</b> were dispensed '+periodWords();
+    if(M.hasPrev&&M.prev.u>0){var pc=Math.round((c-M.prev.u)/M.prev.u*100);s+=', '+(pc>=0?'up ':'down ')+Math.abs(pc)+'% on the previous '+S.days+' days'}
+    out.push(s+'.');
+    if(M.topMeds[0]&&!S.med)out.push(esc(M.topMeds[0].k)+' leads with '+num(M.topMeds[0].v)+' units.');
+  }else out.push('Nothing was dispensed '+periodWords()+' for the current filters.');
+  var c2=M.cnt,risk=c2.expired+c2.out+c2.low+c2.expiring;
+  if(M.total===0)out.push('No medicines match the current filters.');
+  else if(risk===0)out.push('Every medicine in view is healthy.');
+  else{
+    var bits=[];
+    if(c2.out)bits.push(c2.out+' out of stock');if(c2.low)bits.push(c2.low+' low');
+    if(c2.expiring)bits.push(c2.expiring+' expiring within 30 days');if(c2.expired)bits.push(c2.expired+' expired');
+    out.push('<b>'+risk+' of '+M.total+' medicines need attention</b>: '+bits.join(', ')+'.');
+  }
+  return out.join(' ');
+}
+
+function filterBar(M){
+  var chips=[];
+  if(S.med)chips.push(['med','Medicine: '+S.med]);
+  if(S.status)chips.push(['status','Status: '+ST[S.status].l]);
+  if(S.year)chips.push(['year','Year: '+S.year]);
+  var any=!!(S.cat||S.dept||S.med||S.year||S.status);
+  function opts(list,val,all){return'<option value="">'+all+'</option>'+list.map(function(x){return'<option value="'+esc(x)+'"'+(x===val?' selected':'')+'>'+esc(x)+'</option>'}).join('')}
+  var seg=[[7,'7 days'],[30,'30 days'],[90,'90 days'],[0,'All time']].map(function(p){return'<button type="button" data-days="'+p[0]+'" aria-pressed="'+(S.days===p[0])+'">'+p[1]+'</button>'}).join('');
+  return'<div class="rkp-bar" role="group" aria-label="Report filters">'+
+    '<div class="rkp-seg" role="group" aria-label="Period">'+seg+'</div>'+
+    '<select class="rkp-sel" data-sel="cat" aria-label="Category">'+opts(M.catList,S.cat,'All categories')+'</select>'+
+    '<select class="rkp-sel" data-sel="dept" aria-label="Department">'+opts(M.deptList,S.dept,'All departments')+'</select>'+
+    '<div class="rkp-chips">'+chips.map(function(c){return'<button type="button" class="rkp-chip" data-clear="'+c[0]+'" title="Remove filter">'+esc(c[1])+'<span class="material-icons-round">close</span></button>'}).join('')+'</div>'+
+    '<span class="rkp-sp"></span>'+(any?'<button type="button" class="rkp-reset" data-reset="1">Clear filters</button>':'')+
+    '<span class="rkp-stamp">Updated '+M.now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span></div>';
+}
+
+function kpis(M){
+  var c=M.cur,p=M.prev,b=M.buckets,risk=M.cnt.expired+M.cnt.out+M.cnt.low+M.cnt.expiring;
+  var healthy=M.total?Math.round(M.cnt.ok/M.total*100):0,R=18,C=2*Math.PI*R;
+  var ring='<svg class="rkp-ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="'+R+'" fill="none" style="stroke:var(--surface3)" stroke-width="5"/><circle cx="22" cy="22" r="'+R+'" fill="none" stroke="#0CA678" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+(C*healthy/100).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 22 22)"/></svg>';
+  var parts=[];
+  if(M.cnt.out)parts.push(M.cnt.out+' out');if(M.cnt.low)parts.push(M.cnt.low+' low');
+  if(M.cnt.expiring)parts.push(M.cnt.expiring+' expiring');if(M.cnt.expired)parts.push(M.cnt.expired+' expired');
+  return'<div class="rkp-kpis">'+
+   '<div class="rkp-kpi"><div class="l">Units dispensed</div><div class="v">'+num(c.u)+'</div><div class="d">'+delta(c.u,p.u,M.hasPrev)+'</div>'+spark(b.map(function(x){return x.v}),'var(--primary)')+'</div>'+
+   '<div class="rkp-kpi"><div class="l">Student visits</div><div class="v">'+num(c.v)+'</div><div class="d">'+delta(c.v,p.v,M.hasPrev)+'</div>'+spark(b.map(function(x){return Object.keys(x.vis).length}),'#3B9AE1')+'</div>'+
+   '<div class="rkp-kpi"><div class="l">Students seen</div><div class="v">'+num(c.s)+'<small>of '+num(M.studentsTotal)+'</small></div><div class="d">'+(M.studentsTotal?Math.round(c.s/M.studentsTotal*100)+'% of enrolled students':'No students added yet')+'</div></div>'+
+   '<div class="rkp-kpi"><div class="l">Stock value</div><div class="v">'+inr(M.value)+'</div><div class="d">'+num(M.total)+' medicines in view</div></div>'+
+   '<div class="rkp-kpi risk'+(risk?'':' zero')+'"><div class="l">Need attention</div><div class="v">'+num(risk)+'</div><div class="d">'+(parts.length?esc(parts.join(' · ')):'Nothing to restock')+'</div></div>'+
+   '<div class="rkp-kpi"><div class="l">Stock health</div><div class="v">'+healthy+'<small>%</small></div><div class="d">'+num(M.cnt.ok)+' of '+num(M.total)+' healthy</div>'+ring+'</div>'+
+  '</div>';
+}
+
+function trendTile(M){
+  var n=M.buckets.length,tot=M.cur.u;
+  var head='<header><div><h3>Dispensing trend</h3><small>Units dispensed per '+(M.weekly?'week':'day')+', '+periodWords()+'</small></div><div class="rkp-legend"><span><i></i>Units</span>'+(n>14&&!M.weekly?'<span><i class="dash"></i>7-day average</span>':'')+'</div></header>';
+  if(!tot)return'<section class="rkp-tile s8">'+head+'<div class="rkp-empty">No dispensing recorded for this period and filters.<br>Dispense a medicine from the Dispense tab and it will appear here.</div></section>';
+  return'<section class="rkp-tile s8">'+head+'<div class="rkp-trend" id="rkp-trend"></div></section>';
+}
+function drawTrend(M){
+  var host=document.getElementById('rkp-trend');if(!host)return;
+  var b=M.buckets,n=b.length,W=Math.max(300,host.clientWidth||600),H=230,ml=34,mr=10,mt=10,mb=26,pw=W-ml-mr,ph=H-mt-mb;
+  var mx=niceMax(Math.max.apply(null,b.map(function(x){return x.v}).concat([1])));
+  function X(i){return ml+(n>1?i/(n-1)*pw:pw/2)}function Y(v){return mt+ph-(v/mx)*ph}
+  var line=b.map(function(x,i){return(i?'L':'M')+X(i).toFixed(1)+' '+Y(x.v).toFixed(1)}).join('');
+  var area=line+'L'+X(n-1).toFixed(1)+' '+(mt+ph)+'L'+X(0).toFixed(1)+' '+(mt+ph)+'Z';
+  var g='';for(var t=0;t<=4;t++){var v=mx*t/4,y=Y(v);g+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+y+'" y2="'+y+'" style="stroke:var(--border)" stroke-width="1"/><text x="'+(ml-6)+'" y="'+(y+4)+'" text-anchor="end">'+(v%1?v.toFixed(1):num(v))+'</text>'}
+  var xl='',step=Math.max(1,Math.ceil(n/6));
+  for(var i=0;i<n;i+=step){xl+='<text x="'+X(i)+'" y="'+(H-6)+'" text-anchor="'+(i===0?'start':'middle')+'">'+dshort(b[i].d)+'</text>'}
+  var ma='';
+  if(n>14&&!M.weekly){ma='M'+b.map(function(x,i){var s=0,c=0;for(var j=Math.max(0,i-6);j<=i;j++){s+=b[j].v;c++}return X(i).toFixed(1)+' '+Y(s/c).toFixed(1)}).join('L')}
+  host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="Line chart of units dispensed over time">'+
+    '<defs><linearGradient id="rkpg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--primary);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--primary);stop-opacity:0"/></linearGradient></defs>'+g+xl+
+    '<path d="'+area+'" fill="url(#rkpg)"/><path d="'+line+'" fill="none" style="stroke:var(--primary)" stroke-width="2" stroke-linejoin="round"/>'+
+    (ma?'<path d="'+ma+'" fill="none" stroke="#F59F00" stroke-width="1.6" stroke-dasharray="4 3"/>':'')+
+    '<line id="rkp-cx" y1="'+mt+'" y2="'+(mt+ph)+'" style="stroke:var(--text3)" stroke-dasharray="3 3" opacity="0"/><circle id="rkp-cd" r="4.5" style="fill:var(--surface);stroke:var(--primary)" stroke-width="2" opacity="0"/>'+
+    '<rect id="rkp-hit" x="'+ml+'" y="'+mt+'" width="'+pw+'" height="'+ph+'" fill="transparent"/></svg>';
+  var svg=host.firstChild,hit=svg.querySelector('#rkp-hit'),cx=svg.querySelector('#rkp-cx'),cd=svg.querySelector('#rkp-cd');
+  function at(e){
+    var r=svg.getBoundingClientRect(),x=(e.clientX-r.left)*(W/r.width);
+    var i=n>1?Math.round((x-ml)/pw*(n-1)):0;i=Math.max(0,Math.min(n-1,i));
+    cx.setAttribute('x1',X(i));cx.setAttribute('x2',X(i));cx.setAttribute('opacity',1);
+    cd.setAttribute('cx',X(i));cd.setAttribute('cy',Y(b[i].v));cd.setAttribute('opacity',1);
+    var vis=Object.keys(b[i].vis).length,lab=M.weekly?'Week of '+dshort(b[i].d):b[i].d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+    tip('<b>'+esc(lab)+'</b><br>'+num(b[i].v)+' units · '+vis+' visit'+(vis===1?'':'s'),e);
+  }
+  hit.addEventListener('mousemove',at);hit.addEventListener('touchmove',function(e){if(e.touches[0])at(e.touches[0])},{passive:true});
+  hit.addEventListener('mouseleave',function(){cx.setAttribute('opacity',0);cd.setAttribute('opacity',0);tip(null)});
+}
+
+function donutTile(M){
+  var C=2*Math.PI*52,keys=Object.keys(ST).sort(function(a,b){return ST[b].o-ST[a].o}).reverse();
+  keys=['ok','expiring','low','out','expired'];
+  var tot=0;keys.forEach(function(k){tot+=M.cntAll[k]});
+  var cum=0,segs='';
+  if(tot===0)segs='<circle cx="70" cy="70" r="52" fill="none" style="stroke:var(--surface3)" stroke-width="16"/>';
+  else keys.forEach(function(k){
+    var v=M.cntAll[k];if(!v)return;var len=v/tot*C,gap=(tot>v)?2:0,dl=Math.max(len-gap,.5);
+    segs+='<circle class="seg" data-f="status" data-v="'+k+'" data-tip="<b>'+ST[k].l+'</b><br>'+v+' medicine'+(v===1?'':'s')+'" cx="70" cy="70" r="52" fill="none" stroke="'+ST[k].c+'" stroke-width="'+(S.status===k?20:16)+'" stroke-dasharray="'+dl.toFixed(2)+' '+(C-dl).toFixed(2)+'" stroke-dashoffset="'+(-cum).toFixed(2)+'" style="'+(S.status&&S.status!==k?'opacity:.3':'')+'"/>';
+    cum+=len;
+  });
+  var hp=tot?Math.round(M.cntAll.ok/tot*100):0;
+  var lg=keys.map(function(k){return'<button type="button" data-f="status" data-v="'+k+'" aria-pressed="'+(S.status===k)+'"><i style="background:'+ST[k].c+'"></i><span class="n">'+ST[k].l+'</span><span class="c">'+M.cntAll[k]+'</span></button>'}).join('');
+  return'<section class="rkp-tile s4"><header><div><h3>Stock status</h3><small>Select a status to filter the report</small></div></header>'+
+    '<div class="rkp-donutwrap"><div class="rkp-donut"><svg viewBox="0 0 140 140" role="img" aria-label="Donut chart of stock status"><g transform="rotate(-90 70 70)">'+segs+'</g></svg><div class="mid"><b>'+(tot?hp+'%':'—')+'</b><span>healthy</span></div></div><div class="rkp-lg">'+lg+'</div></div></section>';
+}
+
+function hbars(list,field,title,sub,s,fmt){
+  var mx=Math.max.apply(null,list.map(function(x){return x.v}).concat([1])),has=!!S[field];
+  var body=list.length?'<div class="rkp-hbs'+(has?' has-sel':'')+'">'+list.map(function(x){
+    return'<button type="button" class="rkp-hb'+(S[field]===x.k?' sel':'')+'" data-f="'+field+'" data-v="'+esc(x.k)+'" data-tip="<b>'+esc(x.k)+'</b><br>'+num(x.v)+' units">'+
+      '<span class="n">'+esc(x.k)+'</span><span class="b"><i style="width:'+Math.max(2,x.v/mx*100).toFixed(1)+'%"></i></span><span class="v">'+num(x.v)+'</span></button>'}).join('')+'</div>'
+    :'<div class="rkp-empty">Nothing dispensed in this period.</div>';
+  return'<section class="rkp-tile '+s+'"><header><div><h3>'+title+'</h3><small>'+sub+'</small></div></header>'+body+'</section>';
+}
+function yearTile(M){
+  var mx=Math.max.apply(null,M.years.map(function(x){return x.v}).concat([1])),has=!!S.year;
+  var body=M.years.length?'<div class="rkp-cols'+(has?' has-sel':'')+'">'+M.years.map(function(x){
+    return'<button type="button" class="rkp-col'+(S.year===x.k?' sel':'')+'" data-f="year" data-v="'+esc(x.k)+'" data-tip="<b>'+esc(x.k)+'</b><br>'+num(x.v)+' units"><span class="y">'+num(x.v)+'</span><span class="t"><i style="height:'+Math.max(2,x.v/mx*100).toFixed(1)+'%"></i></span><span class="x">'+esc(x.k)+'</span></button>'}).join('')+'</div>'
+    :'<div class="rkp-empty">Nothing dispensed in this period.</div>';
+  return'<section class="rkp-tile s4"><header><div><h3>Usage by student year</h3><small>Units dispensed '+periodWords()+'</small></div></header>'+body+'</section>';
+}
+
+function heatTile(M){
+  var cols=M.cols,cells='',mo='',lastM=-1,wd=['Mon','','Wed','','Fri','','Sun'];
+  for(var c=0;c<cols;c++){
+    var d0=new Date(M.mon);d0.setDate(d0.getDate()+c*7);
+    var mm=d0.getMonth();mo+='<span>'+(mm!==lastM?d0.toLocaleDateString('en-IN',{month:'short'}):'')+'</span>';lastM=mm;
+    for(var r=0;r<7;r++){
+      var d=new Date(M.mon);d.setDate(d.getDate()+c*7+r);var k=dkey(d),v=M.heat[k]||0,fut=d>M.today,cls='c';
+      if(fut)cls+=' fut';else if(v>0)cls+=' on';
+      if(dkey(d)===dkey(M.today))cls+=' today';
+      var lvl=v>0?Math.ceil(v/M.hmax*4):0,o=[0,.25,.45,.7,1][lvl];
+      cells+='<div class="'+cls+'"'+(v>0?' style="--o:'+o+'"':'')+(fut?'':' data-tip="<b>'+esc(d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}))+'</b><br>'+(v?num(v)+' units':'Nothing dispensed')+'"')+'></div>';
+    }
+  }
+  return'<section class="rkp-tile s7"><header><div><h3>Daily activity</h3><small>Units dispensed per day over the last '+cols+' weeks</small></div></header>'+
+    '<div class="rkp-heat"><div class="wd">'+wd.map(function(x){return'<span>'+x+'</span>'}).join('')+'</div><div class="rkp-hm" style="--cols:'+cols+'"><div class="mo">'+mo+'</div><div class="cells">'+cells+'</div>'+
+    '<div class="rkp-hscale">Less '+[.25,.45,.7,1].map(function(o){return'<i style="opacity:'+o+'"></i>'}).join('')+' More</div></div></div></section>';
+}
+
+function treemap(items,x,y,w,h,out){
+  if(!items.length)return;
+  if(items.length===1){out.push({it:items[0],x:x,y:y,w:w,h:h});return}
+  var tot=0;items.forEach(function(i){tot+=i.v});
+  var acc=0,k=0;while(k<items.length-1&&acc+items[k].v<tot/2){acc+=items[k].v;k++}
+  if(k===0){acc=items[0].v;k=1}
+  var a=items.slice(0,k),b=items.slice(k),ta=acc;
+  if(w>=h){var wa=w*ta/tot;treemap(a,x,y,wa,h,out);treemap(b,x+wa,y,w-wa,h,out)}
+  else{var ha=h*ta/tot;treemap(a,x,y,w,ha,out);treemap(b,x,y+ha,w,h-ha,out)}
+}
+function treeTile(M){
+  var items=M.catVal.slice(0,12),out=[];treemap(items,0,0,100,100,out);
+  var body=out.length?'<div class="rkp-tm'+(S.cat?' has-sel':'')+'">'+out.map(function(o,i){
+    var big=o.w*o.h>400;
+    return'<button type="button" class="'+(S.cat===o.it.k?'sel':'')+'" data-f="cat" data-v="'+esc(o.it.k)+'" data-tip="<b>'+esc(o.it.k)+'</b><br>'+inr(o.it.v)+' in stock" style="left:'+o.x+'%;top:'+o.y+'%;width:'+o.w+'%;height:'+o.h+'%;background:'+SW[i%SW.length]+'"><b>'+esc(o.it.k)+'</b>'+(big||o.w>22?'<span>'+inr(o.it.v)+'</span>':'')+'</button>'}).join('')+'</div>'
+    :'<div class="rkp-empty">Add medicines with a price and quantity to see stock value by category.</div>';
+  return'<section class="rkp-tile s5"><header><div><h3>Stock value by category</h3><small>Rectangle size shows rupee value on the shelf</small></div></header>'+body+'</section>';
+}
+
+function runwayTile(M){
+  var r=M.runway,tot=M.total;
+  var segs=[['expired','Expired','#A61E4D'],['d30','Within 30 days','#E8590C'],['d90','31 to 90 days','#F59F00'],['d180','91 to 180 days','#6AA84F'],['later','Over 180 days','#0CA678'],['none','No expiry date','#868E96']];
+  var body=tot?'<div class="rkp-run" role="img" aria-label="Expiry runway">'+segs.filter(function(s){return r[s[0]]>0}).map(function(s){
+      var f=s[0]==='expired'?'expired':s[0]==='d30'?'expiring':'';
+      return'<button type="button" '+(f?'data-f="status" data-v="'+f+'" ':'')+'data-tip="<b>'+s[1]+'</b><br>'+r[s[0]]+' medicine'+(r[s[0]]===1?'':'s')+'" style="flex:'+r[s[0]]+';background:'+s[2]+'">'+(r[s[0]]/tot>.08?r[s[0]]:'')+'</button>'}).join('')+'</div>'+
+    '<div class="rkp-runl">'+segs.filter(function(s){return r[s[0]]>0}).map(function(s){return'<span><i style="background:'+s[2]+'"></i>'+s[1]+'</span>'}).join('')+'</div>'
+    :'<div class="rkp-empty">No medicines to show.</div>';
+  return'<section class="rkp-tile s12"><header><div><h3>Expiry runway</h3><small>How far away each medicine’s expiry date is</small></div></header>'+body+'</section>';
+}
+
+function sortList(M){
+  var l=M.list.slice(),k=T.key,dir=T.dir;
+  l.sort(function(a,b){
+    var x,y;
+    if(k==='sev'){x=ST[a.s].o;y=ST[b.s].o;if(x===y){x=a.q/Math.max(a.min,1);y=b.q/Math.max(b.min,1)}}
+    else if(k==='name'){x=a.name.toLowerCase();y=b.name.toLowerCase()}
+    else if(k==='q'){x=a.q;y=b.q}
+    else if(k==='d'){x=a.d===null?1e9:a.d;y=b.d===null?1e9:b.d}
+    else{x=a.val;y=b.val}
+    return(x<y?-1:x>y?1:0)*dir;
+  });
+  return l;
+}
+function tableTile(M){
+  var l=sortList(M),shown=T.all?l:l.slice(0,8);
+  function th(key,label,cls){return'<th class="'+(cls||'')+'"><button type="button" data-sort="'+key+'">'+label+(T.key===key?'<span class="material-icons-round">'+(T.dir>0?'arrow_upward':'arrow_downward')+'</span>':'')+'</button></th>'}
+  var rows=shown.map(function(x){
+    var s=ST[x.s],pct=Math.max(3,Math.min(100,x.q/Math.max(x.min*3,1)*100));
+    var ex=x.d===null?'<span style="color:var(--text3)">No date</span>':x.d<=0?'<span style="color:#A61E4D;font-weight:600">Expired '+Math.abs(x.d)+' d ago</span>':'<span style="'+(x.d<=30?'color:#E8590C;font-weight:600':'')+'">'+x.d+' days</span>';
+    return'<tr><td><div class="nm">'+esc(x.name)+'</div><div class="sb">'+esc(x.batch?'Batch '+x.batch:'No batch')+'</div></td><td>'+esc(x.cat)+'</td>'+
+      '<td><div class="rkp-db"><span class="bar"><i style="width:'+pct.toFixed(0)+'%;background:'+s.c+'"></i></span><b>'+num(x.q)+'</b></div></td>'+
+      '<td class="num">'+num(x.min)+'</td><td>'+ex+'</td><td class="num">'+inr(x.val)+'</td>'+
+      '<td><span class="rkp-st" style="background:color-mix(in srgb,'+s.c+' 14%,var(--surface));color:'+s.c+'"><i style="background:'+s.c+'"></i>'+s.l+'</span></td>'+
+      '<td class="num"><button type="button" class="rkp-rs" data-restock="'+esc(x.id)+'">Restock</button></td></tr>';
+  }).join('');
+  var body=l.length?'<div class="rkp-tw"><table class="rkp-t"><thead><tr>'+th('name','Medicine')+'<th>Category</th>'+th('q','Stock')+'<th class="num">Min alert</th>'+th('d','Expires in')+th('v','Value','num')+th('sev','Status')+'<th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    (l.length>8?'<button type="button" class="rkp-more" data-more="1">'+(T.all?'Show fewer':'Show all '+l.length+' medicines')+'</button>':'')
+    :'<div class="rkp-empty">No medicines match the current filters.</div>';
+  return'<section class="rkp-tile s12"><header><div><h3>Medicine watchlist</h3><small>Most urgent first. Bars show stock against three times the minimum alert.</small></div></header>'+body+'</section>';
+}
+
+function feedTiles(M){
+  var rec=M.recent.length?'<div class="rkp-feed">'+M.recent.map(function(r){
+    return'<div class="rkp-fi"><span class="rkp-av" style="background:'+colorFor(r.name)+'">'+esc(initials(r.name))+'</span><div class="m"><b>'+esc(r.name)+'</b><span>'+esc(r.med)+(r.doc?' · '+esc(r.doc):'')+'</span></div><div class="r"><strong>×'+num(r.q)+'</strong>'+ago(r.d,M.now)+'</div></div>'}).join('')+'</div>'
+    :'<div class="rkp-empty">No dispensing yet.</div>';
+  var fr=M.freq.length?'<div class="rkp-feed">'+M.freq.map(function(f){
+    return'<div class="rkp-fi"><span class="rkp-av" style="background:'+colorFor(f.name)+'">'+esc(initials(f.name))+'</span><div class="m"><b>'+esc(f.name)+'</b><span>Repeat visitor</span></div><div class="r"><strong>'+f.n+'</strong>visits</div></div>'}).join('')+'</div>'
+    :'<div class="rkp-empty">No student has visited more than once '+periodWords()+'.</div>';
+  var bd=M.bdays.length?'<div class="rkp-feed">'+M.bdays.slice(0,5).map(function(b){
+    return'<div class="rkp-fi"><span class="rkp-av" style="background:'+colorFor(b.name)+'">'+esc(initials(b.name))+'</span><div class="m"><b>'+esc(b.name)+'</b><span>'+esc(b.dept||'Student')+'</span></div><div class="r"><strong>'+(b.left===0?'Today':b.left===1?'Tomorrow':'In '+b.left+' days')+'</strong>'+dshort(b.on)+'</div></div>'}).join('')+'</div>'
+    :'<div class="rkp-empty">No birthdays in the next 14 days.</div>';
+  return'<section class="rkp-tile s4"><header><div><h3>Recent dispensing</h3><small>Latest 7 entries</small></div></header>'+rec+'</section>'+
+    '<section class="rkp-tile s4"><header><div><h3>Frequent visitors</h3><small>Most visits '+periodWords()+'</small></div></header>'+fr+'</section>'+
+    '<section class="rkp-tile s4"><header><div><h3>Upcoming birthdays</h3><small>Next 14 days</small></div></header>'+bd+'</section>';
+}
+
+/* ---- main render ---- */
+var root=document.createElement('div');root.id='rkp-dash';sec.appendChild(root);
+var tipEl=document.createElement('div');tipEl.id='rkp-tip';document.body.appendChild(tipEl);
+
+function tip(html,e){
+  if(!html){tipEl.classList.remove('on');return}
+  tipEl.innerHTML=html;tipEl.classList.add('on');
+  var x=e.clientX+14,y=e.clientY+14,w=tipEl.offsetWidth,h=tipEl.offsetHeight;
+  if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;
+  tipEl.style.left=Math.max(4,x)+'px';tipEl.style.top=Math.max(4,y)+'px';
+}
+
+function visible(){return sec.classList.contains('active')&&document.body.classList.contains('rkp')&&sec.offsetParent!==null}
+function render(force){
+  if(!force&&!visible())return;
+  var M=LAST=model();
+  var cn=(document.getElementById('cn-display')||{}).textContent||'';
+  var hr=M.now.getHours(),greet=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+  var role=ROLE[window.selRole]||'';
+  root.className=FIRST?'rkp-anim':'';
+  root.innerHTML=
+   '<div class="rkp-head"><div><h2>Health center overview</h2><p>'+greet+(role?'. Signed in as '+esc(role)+'.':'.')+' '+M.now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'.</p></div>'+
+   '<div class="rkp-actions"><button type="button" class="rkp-ibtn" data-act="refresh" title="Refresh"><span class="material-icons-round">refresh</span>Refresh</button>'+
+   '<button type="button" class="rkp-ibtn" data-act="focus" title="Hide the sidebar"><span class="material-icons-round">fullscreen</span>Focus</button>'+
+   '<button type="button" class="rkp-ibtn" data-act="print" title="Print or save as PDF"><span class="material-icons-round">print</span>Print</button></div></div>'+
+   filterBar(M)+
+   '<div class="rkp-note"><span class="material-icons-round" aria-hidden="true">insights</span><div>'+narrative(M)+'</div></div>'+
+   kpis(M)+
+   '<div class="rkp-grid">'+trendTile(M)+donutTile(M)+
+     hbars(M.topMeds,'med','Top medicines','Units dispensed '+periodWords(),'s4')+
+     hbars(M.topDept,'dept','Usage by department','Units dispensed '+periodWords(),'s4')+yearTile(M)+
+     heatTile(M)+treeTile(M)+runwayTile(M)+tableTile(M)+feedTiles(M)+
+   '</div>';
+  drawTrend(M);
+  if(FIRST){FIRST=false;setTimeout(function(){root.classList.remove('rkp-anim')},900)}
+  SIG=signature();
+}
+function signature(){
+  var m=window.meds||[],h=window.hist||[],s=window.stus||[],q=0,i;
+  for(i=0;i<m.length;i++)q+=(+m[i].qty||0)*(i+1);
+  return[m.length,h.length,s.length,q,(h[0]&&h[0].dtRaw)||''].join('|');
+}
+
+/* ---- interaction (event delegation) ---- */
+function toggle(f,v){S[f]=(S[f]===v)?'':v}
+root.addEventListener('click',function(e){
+  var t=e.target.closest('[data-days],[data-f],[data-clear],[data-reset],[data-sort],[data-more],[data-restock],[data-act]');
+  if(!t)return;
+  if(t.hasAttribute('data-days'))S.days=+t.getAttribute('data-days');
+  else if(t.hasAttribute('data-f'))toggle(t.getAttribute('data-f'),t.getAttribute('data-v'));
+  else if(t.hasAttribute('data-clear'))S[t.getAttribute('data-clear')]='';
+  else if(t.hasAttribute('data-reset')){S.cat=S.dept=S.med=S.year=S.status=''}
+  else if(t.hasAttribute('data-sort')){var k=t.getAttribute('data-sort');if(T.key===k)T.dir=-T.dir;else{T.key=k;T.dir=1}}
+  else if(t.hasAttribute('data-more'))T.all=!T.all;
+  else if(t.hasAttribute('data-restock')){
+    var raw=t.getAttribute('data-restock'),n=Number(raw);
+    if(typeof window.openRestock==='function')window.openRestock(isNaN(n)?raw:n);return;
+  }else if(t.hasAttribute('data-act')){
+    var a=t.getAttribute('data-act');
+    if(a==='refresh'){render(true);return}
+    if(a==='print'){window.print();return}
+    if(a==='focus'){document.body.classList.toggle('rkp-focus');return}
+  }
+  tip(null);render(true);
+});
+root.addEventListener('change',function(e){
+  var s=e.target.closest('[data-sel]');if(!s)return;
+  S[s.getAttribute('data-sel')]=s.value;render(true);
+});
+root.addEventListener('mousemove',function(e){
+  var t=e.target.closest&&e.target.closest('[data-tip]');
+  if(t&&!t.closest('#rkp-trend'))tip(t.getAttribute('data-tip'),e);
+  else if(!e.target.closest('#rkp-trend'))tip(null);
+});
+root.addEventListener('mouseleave',function(){tip(null)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.body.classList.contains('rkp-focus'))document.body.classList.remove('rkp-focus')});
+
+var rz;addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(function(){if(visible()&&LAST)drawTrend(LAST)},150)});
+
+/* ---- hook into the app ---- */
+var orig=window.updateDash;
+window.updateDash=function(){var r;if(orig)r=orig.apply(this,arguments);try{render()}catch(e){console.error('dashboard render',e)}return r};
+/* catches data that arrives from the server after login, and the dashboard becoming visible */
+setInterval(function(){if(visible()&&signature()!==SIG){try{render()}catch(e){console.error(e)}}},4000);
+new MutationObserver(function(){if(visible())try{render()}catch(e){console.error(e)}}).observe(sec,{attributes:true,attributeFilter:['class']});
+if(visible())render();
+window.rkpRender=function(){render(true)};
+})();
+
 </script>
 </body>
 </html>

@@ -21,7 +21,8 @@
    medicalward / ward123    (Medical Ward Console)
 
  GOOGLE LOGIN (added):
-   POST /auth/google  — "Continue with Google" button.
+   POST /auth/google/link — "Continue with Google" button on the DASHBOARD (top-right): registers a Google account.
+   POST /auth/google      — Google sign-in, allowed ONLY for accounts registered that way.
    GET  /privacy      — privacy policy page (needed by Google Cloud Branding).
    Optional environment variables (set them in Render > Environment):
      GOOGLE_CLIENT_ID       — OAuth Web client ID (default is already set below)
@@ -579,31 +580,23 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
 
 @app.post("/auth/google", response_model=Token, tags=["Auth"])
 def google_login(payload: GoogleLogin, db: Session = Depends(get_db)):
-    """'Continue with Google': verify the Google token, then log the person in
-    with the role they picked on the login screen (admin / doctor / nurse)."""
-    role = (payload.role or "nurse").lower()
-    if role not in ("admin", "doctor", "nurse"):
-        raise HTTPException(status_code=400, detail="Invalid role")
-
+    """Google sign-in for REGISTERED accounts only.
+    A Google account becomes registered when a logged-in user connects it from the dashboard
+    (POST /auth/google/link). An unknown Google account is rejected - no account is created here."""
     info = verify_google_token(payload.credential)
     email = (info.get("email") or "").lower()
     if not email or not info.get("email_verified"):
         raise HTTPException(status_code=401, detail="Google email is not verified")
 
-    # Optional restrictions (both are OFF by default = any Google account is allowed)
     if GOOGLE_ALLOWED_DOMAINS and email.split("@")[-1] not in GOOGLE_ALLOWED_DOMAINS:
         raise HTTPException(status_code=403, detail="This Google account is not allowed")
-    if role == "admin" and GOOGLE_ADMIN_EMAILS and email not in GOOGLE_ADMIN_EMAILS:
-        raise HTTPException(status_code=403, detail="This Google account cannot log in as Admin")
 
-    # One user row per (email, role); its password is random, so it can never be used for password login.
-    username = f"{email} ({role})"
-    user = db.query(User).filter(User.username == username).first()
-    if not user:
-        user = User(username=username, password_hash=hash_password(secrets.token_urlsafe(32)), role=role)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+    matches = db.query(User).filter(func.lower(User.email) == email).all()
+    if not matches:
+        raise HTTPException(status_code=403,
+                            detail="This Google account is not registered. Log in with your username and password, then connect Google from the dashboard.")
+    wanted = (payload.role or "").lower()
+    user = next((u for u in matches if u.role == wanted), matches[0])   # the role is the registered one, never a self-chosen one
 
     user.g_name = info.get("name") or user.g_name or ""
     user.g_picture = info.get("picture") or user.g_picture or ""
@@ -642,6 +635,9 @@ def google_link(payload: GoogleLogin, db: Session = Depends(get_db), current: Us
         raise HTTPException(status_code=401, detail="Google email is not verified")
     if GOOGLE_ALLOWED_DOMAINS and email.split("@")[-1] not in GOOGLE_ALLOWED_DOMAINS:
         raise HTTPException(status_code=403, detail="This Google account is not allowed")
+    taken = db.query(User).filter(func.lower(User.email) == email, User.id != current.id).first()
+    if taken and not taken.username.startswith(email + " ("):   # (old Google-created rows may be re-linked)
+        raise HTTPException(status_code=409, detail="This Google account is already registered to another user")
     current.email = email
     current.g_name = info.get("name") or ""
     current.g_picture = info.get("picture") or ""
