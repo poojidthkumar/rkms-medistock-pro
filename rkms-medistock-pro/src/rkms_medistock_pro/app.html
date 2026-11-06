@@ -5459,7 +5459,7 @@ window.rkUsrResetAll=async function(){
   catch(e){ toast(e.message||'Could not reset users','error'); }
   window.rkRenderUsers();
 };
-// ---------- session restore + single-login heartbeat + per-user Google Drive backup ----------
+// ---------- session restore + single-login heartbeat + one-click server backup to the shared Google Drive ----------
 var hbTimer=null, driveTimer=null, driveTok=null, driveExp=0, tokClient=null;
 function jwtSub(){try{return JSON.parse(atob(authToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub}catch(e){return 'user'}}
 function dKey(k){return 'rk_drive_'+jwtSub()+'_'+k}
@@ -5470,7 +5470,7 @@ function paintBanner(){
   a.onclick=function(e){e.preventDefault();window.rkDriveBackup(true)};
   a.children[0].textContent='cloud_upload'; a.children[2].textContent='backup';
   a.children[1].innerHTML='<div style="font-size:14px;font-weight:700">Google Drive Backup</div><div style="font-size:12px;opacity:.85">'+
-    (last?'Last backup: '+last+' · tap to back up now':'Tap to back up to your own Google Drive')+
+    (last?'Last backup: '+last+' · tap to back up now':'One tap backs up everything to the shared Google Drive')+
     (folder?' · <u onclick="event.stopPropagation();window.open(\''+folder+'\',\'_blank\')">Open folder</u>':'')+'</div>';
 }
 function driveToken(interactive){
@@ -5492,21 +5492,28 @@ async function gfetch(url,opt){
   var r=await fetch(url,opt); if(!r.ok)throw new Error('Google Drive error '+r.status); return r.json();
 }
 window.rkDriveBackup=async function(interactive){
+  /* One click, any user: the SERVER saves the backup to the one shared Google Drive.
+     If the server has no Drive set up yet, the backup file is downloaded instead. */
   try{
-    if(interactive)toast('Connecting to Google Drive…','info');
-    await driveToken(interactive);
+    if(interactive)toast('Backing up…','info');
+    var r=await apiPostJSON('/backup/drive',{auto:!interactive});
+    if(r&&r.ok){
+      localStorage.setItem(dKey('ok'),'1');
+      localStorage.setItem(dKey('last'),new Date().toLocaleString('en-IN'));
+      if(r.link)localStorage.setItem(dKey('folder'),r.link);
+      paintBanner();
+      if(window.rkpBackupRefresh)window.rkpBackupRefresh(true);
+      if(interactive)toast(r.recent?'Already backed up a moment ago':(r.verified?'Backup saved and verified in Google Drive':'Backup saved, but Drive could not confirm the file'),r.verified||r.recent?'success':'info');
+      return;
+    }
+    if(!interactive)return;
     var data=await apiGet('/backup/export-json');
-    var FOLDER='RKMS MediStock Backups', api='https://www.googleapis.com/drive/v3/files';
-    var q=encodeURIComponent("name='"+FOLDER+"' and mimeType='application/vnd.google-apps.folder' and trashed=false");
-    var f=(await gfetch(api+'?q='+q+'&fields=files(id,webViewLink)')).files[0];
-    if(!f)f=await gfetch(api+'?fields=id,webViewLink',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:FOLDER,mimeType:'application/vnd.google-apps.folder'})});
-    var name='RKMS_Backup_'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'.json', b='rkms'+Date.now();
-    var body='--'+b+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:name,parents:[f.id]})+
-      '\r\n--'+b+'\r\nContent-Type: application/json\r\n\r\n'+JSON.stringify(data,null,1)+'\r\n--'+b+'--';
-    await gfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body:body});
-    localStorage.setItem(dKey('folder'),f.webViewLink); localStorage.setItem(dKey('last'),new Date().toLocaleString('en-IN'));
-    paintBanner(); toast('Backup saved in your Google Drive','success');
-  }catch(e){ if(interactive)toast('Drive backup failed: '+(e.message||e),'error'); else console.warn('auto backup skipped',e); }
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),el=document.createElement('a');
+    el.href=u;el.download='RKMS_Backup_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(el);el.click();el.remove();
+    setTimeout(function(){URL.revokeObjectURL(u)},4000);
+    localStorage.setItem(dKey('last'),new Date().toLocaleString('en-IN'));paintBanner();
+    toast('Backup file downloaded. Ask the admin to set up Google Drive for automatic cloud backup.','success');
+  }catch(e){ if(window.rkpBackupRefresh)window.rkpBackupRefresh(true); if(interactive)toast('Backup failed: '+(e.message||e),'error'); else console.warn('auto backup skipped',e); }
 };
 function stopHeartbeat(){clearInterval(hbTimer);clearInterval(driveTimer);hbTimer=null;driveTimer=null;}
 function startHeartbeat(){
@@ -7482,6 +7489,31 @@ body.rkp .rkp-acct{display:flex}
 
 @media(max-width:1180px){body.rkp .rkp-sb .t,.rkp-sb kbd{display:none}body.rkp .rkp-sb{max-width:44px;justify-content:center;padding:0}.rkp-ut{display:none}.rkp-user{padding:3px}.rkp-user .material-icons-round{display:none}}
 @media(max-width:760px){.rkp-acc .a{margin-left:0}}
+
+.rkp-bkb{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 14px;border-radius:8px;border:1px solid var(--border);margin-bottom:12px}
+.rkp-bkb>.material-icons-round{font-size:24px}.rkp-bkb b{display:block;font-size:14px;font-weight:600}.rkp-bkb small{display:block;font-size:12.5px;color:var(--text2);margin-top:2px;line-height:1.45}
+.rkp-bkb .a{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}.rkp-bkb .a a{text-decoration:none}
+.rkp-bkb.good{background:color-mix(in srgb,#0CA678 10%,var(--surface));border-color:color-mix(in srgb,#0CA678 40%,var(--border))}.rkp-bkb.good>.material-icons-round{color:#0CA678}
+.rkp-bkb.warn{background:color-mix(in srgb,#F59F00 11%,var(--surface));border-color:color-mix(in srgb,#F59F00 45%,var(--border))}.rkp-bkb.warn>.material-icons-round{color:#d98a00}
+.rkp-bkb.bad{background:color-mix(in srgb,#E03131 9%,var(--surface));border-color:color-mix(in srgb,#E03131 40%,var(--border))}.rkp-bkb.bad>.material-icons-round{color:#E03131}
+.rkp-bkb.info{background:color-mix(in srgb,var(--c1) 8%,var(--surface))}.rkp-bkb.info>.material-icons-round{color:var(--c1)}
+
+#rkp-view{position:fixed;inset:0;z-index:100001;background:rgba(10,14,28,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:3vh 16px}
+#rkp-view.show{display:flex;animation:rkpFade .15s ease}
+.rkp-vc{width:min(1100px,100%);max-height:92vh;background:var(--surface);border:1px solid var(--border2);border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.4);display:flex;flex-direction:column;overflow:hidden;animation:rkpPop .22s cubic-bezier(.2,.8,.2,1)}
+.rkp-vh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.rkp-vh h3{font-size:16px;font-weight:600;word-break:break-all}.rkp-vh small{display:block;font-size:12.5px;color:var(--text3);margin-top:3px}
+.rkp-vact{display:flex;gap:8px;flex:none}
+.rkp-vt{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.rkp-vtabs{display:flex;gap:4px;flex-wrap:wrap}
+.rkp-vtabs button{border:0;background:transparent;color:var(--text2);font-size:13px;font-weight:500;height:30px;padding:0 12px;border-radius:6px;cursor:pointer}
+.rkp-vtabs button b{font-weight:600;color:var(--text3);margin-left:3px}
+.rkp-vtabs button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.15),inset 0 -2px 0 var(--c1)}
+.rkp-vs{height:32px;border:1px solid var(--border2);background:var(--surface);color:var(--text);border-radius:6px;padding:0 10px;font-size:13px;min-width:200px}
+.rkp-vb{padding:6px 18px 14px;overflow:auto;flex:1;min-height:200px}
+.rkp-vn{font-size:12px;color:var(--text3);margin-top:8px}
+.rkp-raw{font-family:ui-monospace,Menlo,Consolas,monospace!important;font-size:12px;line-height:1.5;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;overflow:auto;margin-top:10px;white-space:pre}
+.rkp-vb .rkp-tw{margin:0}
 @media print{#rkp-bg,#rkp-strip,.rkp-sb,.rkp-acct{display:none!important}}
 
 </style>
@@ -7508,7 +7540,7 @@ var TH={
   graphite:{n:'Graphite',c:['#475569','#0EA5E9','#F59E0B'],ink:'#111827'}
 };
 var WIDGETS=[['trend','Dispensing trend'],['status','Stock status'],['med','Top medicines'],['dept','Department usage'],['year','Student year usage'],
-  ['activity','Daily activity'],['tree','Stock value treemap'],['runway','Expiry runway'],['table','Medicine watchlist'],['feeds','Recent, visitors, birthdays']];
+  ['activity','Daily activity'],['tree','Stock value treemap'],['runway','Expiry runway'],['backup','Backup status'],['table','Medicine watchlist'],['feeds','Recent, visitors, birthdays']];
 var P={theme:'pharmly',bg:'aurora',anim:true,compact:false,glass:true,sbTheme:true,demo:false,hide:{}};
 try{var sv=JSON.parse(localStorage.getItem('rkp_prefs')||'null');if(sv)for(var k0 in sv)P[k0]=sv[k0];if(localStorage.getItem('rkp_ph1')!=='1'){P.theme='pharmly';P.sbTheme=true;localStorage.setItem('rkp_ph1','1');localStorage.setItem('rkp_prefs',JSON.stringify(P))}}catch(e){}
 function savePrefs(){try{localStorage.setItem('rkp_prefs',JSON.stringify(P))}catch(e){}}
@@ -7933,6 +7965,121 @@ function feedTiles(M){
     '<section class="rkp-tile s4"><header><div><h3>Upcoming birthdays</h3><small>Next 14 days</small></div></header>'+bd+'</section>';
 }
 
+/* ---- backup status tile (history comes from the server) ---- */
+var BK={loaded:false,ready:null,items:[],err:''},BKT=0;
+function fmtWhen(iso){var d=new Date(iso);return isNaN(d)?'':d.toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}
+function kb(n){return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'}
+function bkInner(){
+  var head='<header><div><h3>Backup status</h3><small>Every backup is recorded and checked against Google Drive</small></div></header>';
+  if(!BK.loaded)return head+'<div class="rkp-empty">Checking backup history…</div>';
+  if(BK.err)return head+'<div class="rkp-bkb bad"><span class="material-icons-round">error</span><div><b>Could not read backup history</b><small>'+esc(BK.err)+'</small></div></div>';
+  var items=BK.items||[],lastOk=null,i;for(i=0;i<items.length;i++){if(items[i].ok){lastOk=items[i];break}}
+  var latest=items[0],cls='warn',icon='history',title,sub='';
+  if(BK.ready===false&&!items.length){cls='info';icon='cloud_off';title='Google Drive is not set up on the server';sub='Backup now will download the file to this device instead. The admin can set up shared Drive backup once.'}
+  else if(!items.length){title='No backup has been taken yet';sub='Press Backup now to take the first one.'}
+  else if(latest&&!latest.ok){cls='bad';icon='error';title='The last backup attempt failed';sub=latest.error||''}
+  else{
+    var hrs=(Date.now()-new Date(lastOk.at))/36e5;
+    if(!lastOk.verified){cls='warn';icon='help';title='Saved '+ago(new Date(lastOk.at),new Date())+', but Drive could not confirm the file'}
+    else if(hrs>24){cls='warn';icon='schedule';title='No backup in the last 24 hours (last: '+ago(new Date(lastOk.at),new Date())+')'}
+    else{cls='good';icon='verified';title='Backed up '+ago(new Date(lastOk.at),new Date())+' and verified in Google Drive';sub=(lastOk.summary||'')+(lastOk.size?' · '+kb(lastOk.size):'')+' · by '+lastOk.user}
+  }
+  var rows=items.slice(0,6).map(function(b){
+    var st=!b.ok?'<span class="rkp-st" style="background:color-mix(in srgb,#E03131 14%,var(--surface));color:#E03131"><i style="background:#E03131"></i>Failed</span>':
+      b.verified?'<span class="rkp-st" style="background:color-mix(in srgb,#0CA678 14%,var(--surface));color:#0a8a66"><i style="background:#0CA678"></i>Verified</span>':
+      '<span class="rkp-st" style="background:color-mix(in srgb,#F59F00 16%,var(--surface));color:#b97800"><i style="background:#F59F00"></i>Saved, unverified</span>';
+    return'<tr><td>'+esc(fmtWhen(b.at))+'</td><td>'+esc(String(b.user).split(' <')[0])+'</td><td>'+st+'</td><td>'+(b.ok?esc(b.summary)+(b.size?' · '+kb(b.size):''):'<span style="color:#E03131">'+esc(b.error||'')+'</span>')+'</td><td class="num" style="white-space:nowrap">'+(b.ok&&b.has_file?'<button type="button" class="rkp-rs" data-bk="view" data-id="'+b.id+'">View</button> <button type="button" class="rkp-rs" data-bk="dl" data-id="'+b.id+'">Download</button>':'')+'</td></tr>'}).join('');
+  return head+'<div class="rkp-bkb '+cls+'"><span class="material-icons-round">'+icon+'</span><div><b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</div>'+
+    '<div class="a"><button type="button" class="rkp-ibtn" data-act="backup"><span class="material-icons-round">cloud_upload</span>Backup now</button>'+
+    '<button type="button" class="rkp-ibtn" data-bk="live" title="See what a backup taken right now would contain"><span class="material-icons-round">visibility</span>Preview current data</button>'+
+    (lastOk&&lastOk.link?'<a class="rkp-ibtn" href="'+esc(lastOk.link)+'" target="_blank" rel="noopener"><span class="material-icons-round">folder_open</span>Open Drive folder</a>':'')+'</div></div>'+
+    (rows?'<div class="rkp-tw"><table class="rkp-t" style="min-width:640px"><thead><tr><th>When</th><th>By</th><th>Result</th><th>What was saved</th><th>File</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'');
+}
+function backupTile(){return'<section class="rkp-tile s12" id="rkp-bk">'+bkInner()+'</section>'}
+function loadBackups(force){
+  if(typeof apiGet!=='function')return;
+  if(!force&&Date.now()-BKT<60000)return;
+  BKT=Date.now();
+  apiGet('/backup/history?limit=8').then(function(d){BK={loaded:true,ready:d.drive_ready,items:d.items||[],err:''}}).catch(function(e){BK.loaded=true;BK.err=(e&&e.message)||'Unknown error'}).then(function(){var el=document.getElementById('rkp-bk');if(el)el.innerHTML=bkInner()});
+}
+window.rkpBackupRefresh=function(f){loadBackups(f)};
+
+/* ---- backup file viewer: look inside a saved backup without leaving the app ---- */
+var vwEl=null,VW=null;
+function bkMeta(id){var it=(BK.items||[]).filter(function(x){return String(x.id)===String(id)})[0];return it||null}
+function bkAction(t){
+  var a=t.getAttribute('data-bk'),id=t.getAttribute('data-id');
+  if(a==='view')openView(id);else if(a==='live')openView('live');else if(a==='dl')downloadBackup(id);
+}
+async function downloadBackup(id){
+  try{
+    var blob,name;
+    if(id==='live'){var d=await apiGet('/backup/export-json');blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});name='RKMS_Backup_'+new Date().toISOString().slice(0,10)+'.json'}
+    else{
+      var r=await fetch(API_BASE+'/backup/file/'+id+'?download=1',{headers:{Authorization:'Bearer '+authToken}});
+      if(!r.ok){var j={};try{j=await r.json()}catch(e){}throw new Error(j.detail||('Error '+r.status))}
+      blob=await r.blob();var m=bkMeta(id);name=(m&&m.name)||('RKMS_Backup_'+id+'.json');
+    }
+    var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);
+  }catch(e){if(window.toast)toast('Could not download: '+(e.message||e),'error')}
+}
+var SECS=[['medicines','Medicines'],['students','Students'],['doctors','Doctors'],['notices','Notices']];
+function pretty(k){k=k.replace(/_/g,' ');return k.charAt(0).toUpperCase()+k.slice(1)}
+function cell(v){
+  if(v===null||v===undefined||v==='')return'<span style="color:var(--text3)">–</span>';
+  if(typeof v==='boolean')return v?'Yes':'No';
+  if(typeof v==='object')return esc(JSON.stringify(v).slice(0,60));
+  var t=String(v);if(/^\d{4}-\d{2}-\d{2}T/.test(t)){var d=new Date(t);if(!isNaN(d))t=d.toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'})}
+  return esc(t.length>60?t.slice(0,60)+'…':t);
+}
+function viewCols(rows){
+  var keys=[],seen={};
+  rows.slice(0,25).forEach(function(r){Object.keys(r).forEach(function(k){if(!seen[k]){seen[k]=1;keys.push(k)}})});
+  return keys.filter(function(k){return!rows.slice(0,25).some(function(r){var v=r[k];return v&&typeof v==='object'||typeof v==='string'&&v.length>160})}).slice(0,9);
+}
+function drawViewBody(){
+  var box=vwEl.querySelector('.rkp-vb'),d=VW.data,q=VW.q.trim().toLowerCase();
+  if(VW.tab==='raw'){
+    var txt=JSON.stringify(d,null,2);box.innerHTML='<pre class="rkp-raw">'+esc(txt.slice(0,80000))+'</pre>'+(txt.length>80000?'<p class="rkp-vn">Showing the first part only. Download the file for the full text.</p>':'');return;
+  }
+  var all=Array.isArray(d[VW.tab])?d[VW.tab]:[];
+  var rows=q?all.filter(function(r){return JSON.stringify(r).toLowerCase().indexOf(q)>-1}):all;
+  if(!all.length){box.innerHTML='<div class="rkp-empty">Nothing saved in this section.</div>';return}
+  if(!rows.length){box.innerHTML='<div class="rkp-empty">No match for “'+esc(VW.q)+'”.</div>';return}
+  var cols=viewCols(rows),shown=rows.slice(0,200);
+  box.innerHTML='<div class="rkp-tw"><table class="rkp-t" style="min-width:'+Math.max(560,cols.length*120)+'px"><thead><tr>'+cols.map(function(k){return'<th>'+esc(pretty(k))+'</th>'}).join('')+'</tr></thead><tbody>'+
+    shown.map(function(r){return'<tr>'+cols.map(function(k){return'<td>'+cell(r[k])+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>'+
+    '<p class="rkp-vn">'+(rows.length>200?'Showing the first 200 of '+num(rows.length)+' rows. Download the file for everything.':num(rows.length)+' row'+(rows.length===1?'':'s'))+(q?' (filtered from '+num(all.length)+')':'')+'</p>';
+}
+function drawView(){
+  var d=VW.data,m=VW.id==='live'?null:bkMeta(VW.id);
+  var title=VW.id==='live'?'Current data (what a backup taken now would contain)':(m?m.name:'Backup file');
+  var meta=VW.id==='live'?'Live preview. Nothing is saved.':(m?'Saved '+fmtWhen(m.at)+' by '+esc(String(m.user).split(' <')[0])+(m.size?' · '+kb(m.size):'')+(m.verified?' · verified in Drive':''):'');
+  var tabs=SECS.map(function(x){var n=(d[x[0]]||[]).length;return'<button type="button" role="tab" data-vt="'+x[0]+'" aria-selected="'+(VW.tab===x[0])+'">'+x[1]+' <b>'+num(n)+'</b></button>'}).join('')+'<button type="button" role="tab" data-vt="raw" aria-selected="'+(VW.tab==='raw')+'">Raw JSON</button>';
+  vwEl.querySelector('.rkp-vc').innerHTML='<div class="rkp-vh"><div><h3>'+esc(title)+'</h3><small>'+meta+'</small></div><div class="rkp-vact"><button type="button" class="rkp-ibtn" data-vdl="1"><span class="material-icons-round">download</span>Download</button><button type="button" class="rkp-ibtn" data-vx="1" aria-label="Close"><span class="material-icons-round">close</span></button></div></div>'+
+    '<div class="rkp-vt"><div class="rkp-vtabs" role="tablist">'+tabs+'</div><input type="search" class="rkp-vs" placeholder="Search in this table" value="'+esc(VW.q)+'" aria-label="Search in this table"></div><div class="rkp-vb"></div>';
+  drawViewBody();
+}
+async function openView(id){
+  if(!vwEl){
+    vwEl=document.createElement('div');vwEl.id='rkp-view';vwEl.setAttribute('role','dialog');vwEl.setAttribute('aria-modal','true');vwEl.innerHTML='<div class="rkp-vc"></div>';document.body.appendChild(vwEl);
+    vwEl.addEventListener('mousedown',function(e){if(e.target===vwEl)closeView()});
+    vwEl.addEventListener('click',function(e){
+      var t=e.target.closest('[data-vt],[data-vx],[data-vdl]');if(!t)return;
+      if(t.hasAttribute('data-vx'))closeView();
+      else if(t.hasAttribute('data-vdl'))downloadBackup(VW.id);
+      else{VW.tab=t.getAttribute('data-vt');VW.q='';drawView()}
+    });
+    vwEl.addEventListener('input',function(e){if(e.target.classList.contains('rkp-vs')){VW.q=e.target.value;drawViewBody()}});
+  }
+  vwEl.classList.add('show');vwEl.querySelector('.rkp-vc').innerHTML='<div class="rkp-empty" style="min-height:240px">Opening the backup file…</div>';
+  try{
+    var d=await apiGet(id==='live'?'/backup/export-json':'/backup/file/'+id);
+    VW={id:id,data:d,tab:'medicines',q:''};drawView();
+  }catch(e){vwEl.querySelector('.rkp-vc').innerHTML='<div class="rkp-vh"><div><h3>Could not open the file</h3><small>'+esc(e.message||e)+'</small></div><div class="rkp-vact"><button type="button" class="rkp-ibtn" data-vx="1">Close</button></div></div>'}
+}
+function closeView(){if(vwEl)vwEl.classList.remove('show')}
+
 /* ---- main render ---- */
 var strip=document.createElement('div');strip.id='rkp-strip';sec.appendChild(strip);
 var root=document.createElement('div');root.id='rkp-dash';sec.appendChild(root);
@@ -7960,6 +8107,7 @@ function render(force,why){
   root.innerHTML=
    '<div class="rkp-head"><div><h2>Health center overview</h2><p>'+greet+(role?'. Signed in as '+esc(role)+'.':'.')+' '+M.now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'.</p></div>'+
    '<div class="rkp-actions"><button type="button" class="rkp-ibtn" data-act="refresh" title="Refresh"><span class="material-icons-round">refresh</span>Refresh</button>'+
+   '<button type="button" class="rkp-ibtn" data-act="backup" title="Back up all data to the shared Google Drive"><span class="material-icons-round">cloud_upload</span>Backup now</button>'+
    '<button type="button" class="rkp-ibtn" data-act="custom" title="Theme, background and widgets"><span class="material-icons-round">tune</span>Customize</button>'+
    '<button type="button" class="rkp-ibtn" data-act="focus" title="Hide the sidebar"><span class="material-icons-round">fullscreen</span>Focus</button>'+
    '<button type="button" class="rkp-ibtn" data-act="print" title="Print or save as PDF"><span class="material-icons-round">print</span>Print</button></div></div>'+
@@ -7969,7 +8117,7 @@ function render(force,why){
    '<div class="rkp-grid">'+W('trend',trendTile(M))+W('status',donutTile(M))+
      W('med',hbars(M.topMeds,'med','Top medicines','Units dispensed '+periodWords(),'s4'))+
      W('dept',hbars(M.topDept,'dept','Usage by department','Units dispensed '+periodWords(),'s4'))+W('year',yearTile(M))+
-     W('activity',heatTile(M))+W('tree',treeTile(M))+W('runway',runwayTile(M))+W('table',tableTile(M))+W('feeds',feedTiles(M))+
+     W('activity',heatTile(M))+W('tree',treeTile(M))+W('runway',runwayTile(M))+W('backup',backupTile())+W('table',tableTile(M))+W('feeds',feedTiles(M))+
    '</div>';
   drawTrend(M);
   var nodes=root.querySelectorAll('.rkp-kpi,.rkp-tile');
@@ -7977,6 +8125,7 @@ function render(force,why){
   if(SWEEP&&P.anim&&!reduce){nodes.forEach&&nodes.forEach(function(n){n.classList.add('rkp-sweep')});setTimeout(function(){root.querySelectorAll('.rkp-sweep').forEach(function(n){n.classList.remove('rkp-sweep')})},1000)}
   SWEEP=false;
   countUps();
+  loadBackups(why==='filter'&&FIRST);
   if(FIRST){FIRST=false}
   if(animate)setTimeout(function(){root.classList.remove('rkp-anim','rkp-first')},1800);
   SIG=signature();
@@ -8001,7 +8150,7 @@ function signature(){
 /* ---- dashboard interaction (event delegation) ---- */
 function toggle(f,v){S[f]=(S[f]===v)?'':v}
 root.addEventListener('click',function(e){
-  var t=e.target.closest('[data-days],[data-f],[data-clear],[data-reset],[data-sort],[data-more],[data-restock],[data-act]');
+  var t=e.target.closest('[data-days],[data-f],[data-clear],[data-reset],[data-sort],[data-more],[data-restock],[data-act],[data-bk]');
   if(!t)return;
   var why='filter';
   if(t.hasAttribute('data-days'))S.days=+t.getAttribute('data-days');
@@ -8009,16 +8158,18 @@ root.addEventListener('click',function(e){
   else if(t.hasAttribute('data-clear'))S[t.getAttribute('data-clear')]='';
   else if(t.hasAttribute('data-reset')){S.cat=S.dept=S.med=S.year=S.status=''}
   else if(t.hasAttribute('data-sort')){var k=t.getAttribute('data-sort');if(T.key===k)T.dir=-T.dir;else{T.key=k;T.dir=1};why=''}
+  else if(t.hasAttribute('data-bk')){bkAction(t);return}
   else if(t.hasAttribute('data-more')){T.all=!T.all;why=''}
   else if(t.hasAttribute('data-restock')){
     var raw=t.getAttribute('data-restock'),n=Number(raw);
     if(typeof window.openRestock==='function')window.openRestock(isNaN(n)?raw:n);return;
   }else if(t.hasAttribute('data-act')){
     var a=t.getAttribute('data-act');
-    if(a==='refresh'){SWEEP=true;render(true,'filter');return}
+    if(a==='refresh'){SWEEP=true;loadBackups(true);render(true,'filter');return}
     if(a==='print'){window.print();return}
     if(a==='focus'){document.body.classList.toggle('rkp-focus');return}
     if(a==='custom'){openCustom();return}
+    if(a==='backup'){if(window.rkDriveBackup)window.rkDriveBackup(true);return}
     if(a==='demo'){P.demo=!P.demo;savePrefs();FIRST=true;SWEEP=true;render(true,'filter');return}
   }
   tip(null);SWEEP=true;render(true,why);
@@ -8202,7 +8353,7 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();palEl&&palEl.classList.contains('show')?closePal():openPal();return}
   var tg=e.target&&e.target.tagName;
   if(e.key==='/'&&tg!=='INPUT'&&tg!=='TEXTAREA'&&tg!=='SELECT'&&!(e.target&&e.target.isContentEditable)){e.preventDefault();openPal();return}
-  if(e.key==='Escape'){closePal();closeCustom();document.body.classList.remove('rkp-focus')}
+  if(e.key==='Escape'){closePal();closeCustom();closeView();document.body.classList.remove('rkp-focus')}
 });
 
 /* ===== customize drawer ===== */

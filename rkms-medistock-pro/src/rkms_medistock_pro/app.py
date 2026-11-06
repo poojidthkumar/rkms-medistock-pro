@@ -51,6 +51,8 @@ import shutil
 import secrets
 import urllib.parse
 import urllib.request
+import urllib.error
+import time
 from datetime import datetime, timedelta, date
 from typing import Optional, List
 
@@ -223,7 +225,29 @@ class ActivityLog(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
 
+class BackupLog(Base):
+    """One row per backup attempt, so anyone can check that a backup really reached Google Drive."""
+    __tablename__ = "backup_log"
+    id = Column(Integer, primary_key=True, index=True)
+    at = Column(DateTime, default=datetime.utcnow)
+    username = Column(String, default="")
+    ok = Column(Boolean, default=False)
+    verified = Column(Boolean, default=False)      # server re-read the file from Drive and the size matched
+    name = Column(String, default="")
+    size = Column(Integer, default=0)
+    summary = Column(String, default="")           # e.g. "24 medicines, 130 students, 4 doctors"
+    link = Column(String, default="")
+    error = Column(String, default="")
+    file_id = Column(String, default="")           # Google Drive file id, used by View / Download
+
+
 Base.metadata.create_all(bind=engine)
+try:                                               # older databases: add the new column once
+    from sqlalchemy import text as _sqltext
+    with engine.begin() as _c:
+        _c.execute(_sqltext("ALTER TABLE backup_log ADD COLUMN file_id VARCHAR DEFAULT ''"))
+except Exception:
+    pass                                           # column already exists - nothing to do
 
 
 def _migrate_user_columns():
@@ -1402,10 +1426,8 @@ def backup_restore(file: UploadFile = File(...), current: User = Depends(require
     return {"ok": True, "message": "Database restored. Please restart the app."}
 
 
-@app.get("/backup/export-json", tags=["Backup"])
-def backup_export_json(db: Session = Depends(get_db), current: User = Depends(get_current_user)):
-    """A human-readable JSON backup, mirrors the original app's 'Download Backup (JSON)' button."""
-    data = {
+def _backup_payload(db: Session, current: User) -> dict:
+    return {
         "exported_at": datetime.utcnow().isoformat(),
         "exported_by": current.username,
         "medicines": [MedicineOut.model_validate(m).model_dump(mode="json") for m in db.query(Medicine).all()],
@@ -1413,11 +1435,177 @@ def backup_export_json(db: Session = Depends(get_db), current: User = Depends(ge
         "doctors": [DoctorOut.model_validate(d).model_dump(mode="json") for d in db.query(Doctor).all()],
         "notices": [NoticeOut.model_validate(n).model_dump(mode="json") for n in db.query(Notice).all()],
     }
-    buf = io.StringIO(json.dumps(data, indent=2, default=str))
+
+
+@app.get("/backup/export-json", tags=["Backup"])
+def backup_export_json(db: Session = Depends(get_db), current: User = Depends(get_current_user)):
+    """A human-readable JSON backup, mirrors the original app's 'Download Backup (JSON)' button."""
+    buf = io.StringIO(json.dumps(_backup_payload(db, current), indent=2, default=str))
     return StreamingResponse(
         iter([buf.getvalue()]), media_type="application/json",
         headers={"Content-Disposition": f'attachment; filename="RKMS_Backup_{date.today()}.json"'}
     )
+
+
+# ----------------------------------------------------------------
+# ONE-CLICK BACKUP TO A SINGLE SHARED GOOGLE DRIVE  (done by the SERVER)
+# Any logged-in user can press "Backup now"; nobody needs their own Google setup.
+# Set ONE of these up once (by the admin), as environment variables:
+#   A) Service account  : GOOGLE_SERVICE_ACCOUNT_JSON (key JSON text) or GOOGLE_SERVICE_ACCOUNT_FILE (path)
+#                         + GOOGLE_DRIVE_FOLDER_ID  (folder in a *Shared drive*, shared with the service account)
+#   B) Owner's Drive    : GOOGLE_CLIENT_SECRET + GOOGLE_DRIVE_REFRESH_TOKEN  (+ optional GOOGLE_DRIVE_FOLDER_ID)
+# If neither is set, the button still works: the browser downloads the backup file instead.
+# ----------------------------------------------------------------
+GOOGLE_SA_JSON = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+GOOGLE_SA_FILE = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_DRIVE_REFRESH_TOKEN = os.environ.get("GOOGLE_DRIVE_REFRESH_TOKEN", "")
+GOOGLE_DRIVE_FOLDER_ID = os.environ.get("GOOGLE_DRIVE_FOLDER_ID", "")
+DRIVE_FOLDER_NAME = "RKMS MediStock Backups"
+_last_drive = {"t": 0.0, "name": "", "link": ""}
+
+
+def _drive_configured() -> bool:
+    return bool(GOOGLE_SA_JSON.strip() or (GOOGLE_SA_FILE and os.path.exists(GOOGLE_SA_FILE))
+                or (GOOGLE_CLIENT_SECRET and GOOGLE_DRIVE_REFRESH_TOKEN))
+
+
+def _drive_token() -> Optional[str]:
+    sa = GOOGLE_SA_JSON.strip()
+    if not sa and GOOGLE_SA_FILE and os.path.exists(GOOGLE_SA_FILE):
+        with open(GOOGLE_SA_FILE, encoding="utf-8") as fh:
+            sa = fh.read()
+    if sa:
+        try:
+            from google.oauth2 import service_account
+            from google.auth.transport.requests import Request as _GReq
+        except ImportError:
+            raise HTTPException(500, "Server needs:  pip install google-auth requests")
+        creds = service_account.Credentials.from_service_account_info(
+            json.loads(sa), scopes=["https://www.googleapis.com/auth/drive"])
+        creds.refresh(_GReq())
+        return creds.token
+    if GOOGLE_CLIENT_SECRET and GOOGLE_DRIVE_REFRESH_TOKEN:
+        data = urllib.parse.urlencode({
+            "client_id": GOOGLE_CLIENT_ID, "client_secret": GOOGLE_CLIENT_SECRET,
+            "refresh_token": GOOGLE_DRIVE_REFRESH_TOKEN, "grant_type": "refresh_token"}).encode()
+        with urllib.request.urlopen(urllib.request.Request("https://oauth2.googleapis.com/token", data=data), timeout=20) as r:
+            return json.loads(r.read())["access_token"]
+    return None
+
+
+def _gd(token: str, method: str, url: str, body: Optional[bytes] = None, ctype: str = "application/json", raw: bool = False):
+    req = urllib.request.Request(url, data=body, method=method,
+                                 headers={"Authorization": "Bearer " + token, "Content-Type": ctype})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = r.read()
+            return data if raw else json.loads(data or b"{}")
+    except urllib.error.HTTPError as e:
+        try:
+            err = json.loads(e.read()).get("error", {})
+            why = (err.get("errors") or [{}])[0].get("reason") or err.get("status") or ""
+            msg = f"{err.get('message', '')} ({why})".strip()
+        except Exception:
+            msg = ""
+        raise HTTPException(502, f"Google Drive error {e.code}: {msg or e.reason}")
+
+
+class DriveBackupIn(BaseModel):
+    auto: bool = False
+
+
+def _backup_row(b: "BackupLog") -> dict:
+    return {"id": b.id, "at": (b.at.isoformat() + "Z") if b.at else "", "user": b.username, "ok": bool(b.ok),
+            "verified": bool(b.verified), "name": b.name, "size": b.size or 0, "summary": b.summary,
+            "link": b.link, "error": b.error, "has_file": bool(getattr(b, "file_id", ""))}
+
+
+@app.get("/backup/status", tags=["Backup"])
+def backup_status(db: Session = Depends(get_db), current: User = Depends(get_current_user)):
+    last = db.query(BackupLog).filter(BackupLog.ok == True).order_by(BackupLog.id.desc()).first()   # noqa: E712
+    return {"drive_ready": _drive_configured(), "last": _backup_row(last) if last else None}
+
+
+@app.get("/backup/history", tags=["Backup"])
+def backup_history(limit: int = Query(15, ge=1, le=100), db: Session = Depends(get_db),
+                   current: User = Depends(get_current_user)):
+    """Newest first. Shows who backed up, when, whether it succeeded and whether Drive really has the file."""
+    rows = db.query(BackupLog).order_by(BackupLog.id.desc()).limit(limit).all()
+    return {"drive_ready": _drive_configured(), "items": [_backup_row(r) for r in rows]}
+
+
+@app.get("/backup/file/{log_id}", tags=["Backup"])
+def backup_file(log_id: int, download: bool = Query(False), db: Session = Depends(get_db),
+                current: User = Depends(get_current_user)):
+    """Open (or download) the backup file that was saved to Google Drive. The server reads it from
+    Drive, so the person looking at it needs no Google account or Drive permission."""
+    row = db.query(BackupLog).filter(BackupLog.id == log_id, BackupLog.ok == True).first()   # noqa: E712
+    if not row or not row.file_id:
+        raise HTTPException(404, "This backup file is not available")
+    token = _drive_token()
+    if not token:
+        raise HTTPException(400, "Google Drive is not set up on the server")
+    data = _gd(token, "GET", f"https://www.googleapis.com/drive/v3/files/{row.file_id}?alt=media&supportsAllDrives=true", raw=True)
+    disp = "attachment" if download else "inline"
+    return StreamingResponse(iter([data]), media_type="application/json",
+                             headers={"Content-Disposition": f'{disp}; filename="{row.name}"'})
+
+
+@app.post("/backup/drive", tags=["Backup"])
+def backup_to_drive(body: DriveBackupIn = DriveBackupIn(), db: Session = Depends(get_db),
+                    current: User = Depends(get_current_user)):
+    """Any logged-in user: save a full JSON backup into the ONE shared Google Drive and verify it arrived."""
+    if not _drive_configured():
+        return {"ok": False, "mode": "download", "reason": "Drive backup is not set up on the server yet."}
+    gap = 1500 if body.auto else 15            # seconds between two real uploads
+    if _last_drive["name"] and time.time() - _last_drive["t"] < gap:
+        return {"ok": True, "mode": "drive", "recent": True, "verified": _last_drive.get("verified", False),
+                "name": _last_drive["name"], "link": _last_drive["link"]}
+    row = BackupLog(username=current.username, ok=False)
+    try:
+        token = _drive_token()
+        api = "https://www.googleapis.com/drive/v3/files"
+        folder = GOOGLE_DRIVE_FOLDER_ID.strip()
+        if not folder:                          # owner mode: find or create the folder by name
+            q = urllib.parse.quote(f"name='{DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false")
+            found = _gd(token, "GET", f"{api}?q={q}&fields=files(id)&supportsAllDrives=true&includeItemsFromAllDrives=true").get("files", [])
+            folder = found[0]["id"] if found else _gd(
+                token, "POST", f"{api}?fields=id&supportsAllDrives=true",
+                json.dumps({"name": DRIVE_FOLDER_NAME, "mimeType": "application/vnd.google-apps.folder"}).encode())["id"]
+        data = _backup_payload(db, current)
+        payload = json.dumps(data, indent=1, default=str)
+        raw = payload.encode("utf-8")
+        row.name = "RKMS_Backup_" + datetime.now().strftime("%Y-%m-%d_%H-%M") + ".json"
+        row.size = len(raw)
+        row.summary = (f"{len(data['medicines'])} medicines, {len(data['students'])} students, "
+                       f"{len(data['doctors'])} doctors, {len(data['notices'])} notices")
+        b = "rkms" + secrets.token_hex(8)
+        mp = (f"--{b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"
+              + json.dumps({"name": row.name, "parents": [folder]})
+              + f"\r\n--{b}\r\nContent-Type: application/json\r\n\r\n").encode("utf-8") + raw + f"\r\n--{b}--".encode()
+        up = _gd(token, "POST", "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id&supportsAllDrives=true",
+                 mp, f"multipart/related; boundary={b}")
+        # VERIFY: ask Drive for the file we just wrote and compare its size
+        chk = _gd(token, "GET", f"{api}/{up['id']}?fields=id,name,size,trashed&supportsAllDrives=true")
+        row.verified = (not chk.get("trashed")) and int(chk.get("size", -1)) == len(raw)
+        row.link = f"https://drive.google.com/drive/folders/{folder}"
+        row.file_id = up["id"]
+        row.ok = True
+    except HTTPException as e:
+        row.error = str(e.detail)[:400]
+        db.add(row); db.commit()
+        raise
+    except Exception as e:
+        row.error = f"{type(e).__name__}: {e}"[:400]
+        db.add(row); db.commit()
+        raise HTTPException(502, "Backup failed: " + row.error)
+    db.add(row)
+    log_action(db, f"Backup saved to Google Drive by {current.username} ({row.summary})", current.username, "info")
+    db.commit()
+    _last_drive.update(t=time.time(), name=row.name, link=row.link, verified=row.verified)
+    return {"ok": True, "mode": "drive", "name": row.name, "link": row.link, "verified": row.verified,
+            "size": row.size, "summary": row.summary}
 
 
 # ================================================================
