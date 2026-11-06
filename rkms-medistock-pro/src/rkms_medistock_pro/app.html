@@ -1386,7 +1386,7 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
   <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">person_search</span> Search Student</div></div>
     <div class="mcard-body">
       <div class="ac-wrap">
-        <div class="search-wrap" style="margin-bottom:0"><span class="material-icons-round search-icon">search</span><input class="search-input" type="text" id="ds" placeholder="Type student name..." oninput="searchAC(this.value)" autocomplete="off"></div>
+        <div class="search-wrap" style="margin-bottom:0"><span class="material-icons-round search-icon">search</span><input class="search-input" type="text" id="ds" placeholder="Type student name..." oninput="searchAC(this.value)" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
         <div class="ac-dropdown" id="acl"></div>
       </div>
       <div id="d-prof" style="display:none">
@@ -8083,5 +8083,17 @@ body.rkp .rkp-acct{flex:none}
   if(dash){new MutationObserver(moveStrip).observe(dash,{childList:true});moveStrip();setInterval(moveStrip,1500)}
 })();
 </script>
+<style id="rk-fix-dispense">
+/* Dispense page: student search (only this box) */
+#sec-dispense #ds.search-input{padding:12px 46px 12px 46px!important;font-size:15px!important;font-weight:600;line-height:1.3;height:auto;letter-spacing:0;color:var(--text)!important;-webkit-text-fill-color:var(--text);caret-color:var(--primary)}
+#sec-dispense #ds.search-input::placeholder{font-weight:500;color:var(--text3);-webkit-text-fill-color:var(--text3)}
+#sec-dispense .search-wrap{position:relative}
+#sec-dispense .search-wrap .search-icon{left:14px;z-index:2;pointer-events:none}
+#sec-dispense .ac-wrap{position:relative;z-index:30}
+/* the result list was cut off by the card, let it float above the page */
+#sec-dispense .mcard,#sec-dispense .mcard-body{overflow:visible!important}
+#sec-dispense .ac-dropdown{z-index:500!important;max-height:min(340px,55vh);overflow:auto;border-radius:14px;box-shadow:0 18px 44px rgba(1,43,36,.22);margin-top:6px;background:var(--surface)!important;border:1px solid var(--border)}
+#sec-dispense .ac-dropdown>*{font-size:13.5px;color:var(--text)}
+</style>
 </body>
 </html>
