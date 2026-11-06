@@ -1177,6 +1177,119 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
 .role-tab{color:rgba(255,255,255,.9)!important}
 .login-screen::after{opacity:.45}
 </style>
+
+<style id="rk-ui-v9">
+/* ================= PRINT SHEET (report layout) ================= */
+#rk-print{display:none}
+@media print{
+  @page{size:A4;margin:13mm 12mm 17mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font:9px Arial;color:#6b7280}@bottom-left{content:"RKMS MediStock Pro \00B7  System-generated report";font:9px Arial;color:#6b7280}}
+  body>*:not(#rk-print){display:none!important}
+  html,html body,html body[class][class][class]{background:#fff!important;background-image:none!important}body::before,body::after{display:none!important}
+  #rk-print{display:block!important;background:#fff;color:#111827;font:12px/1.5 'Plus Jakarta Sans',Inter,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rkpr-bar{height:5px;border-radius:99px;background:linear-gradient(90deg,#4338CA,#F43F73,#14B8A6);margin-bottom:12px}
+  .rkpr-head{display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:1px solid #E3E5F5}
+  .rkpr-logo{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #E3E5F5}
+  .rkpr-org{flex:1}.rkpr-org b{display:block;font:800 18px 'Space Grotesk','Plus Jakarta Sans',Arial,sans-serif;letter-spacing:-.3px;color:#1E1B4B}
+  .rkpr-org span{color:#6b7280;font-size:11.5px}
+  .rkpr-tag{text-align:right}.rkpr-tag em{display:inline-block;font-style:normal;font-weight:800;font-size:10px;letter-spacing:1.5px;color:#fff;background:#4338CA;padding:4px 10px;border-radius:99px}
+  .rkpr-tag h1{margin:6px 0 0;font:800 20px 'Space Grotesk','Plus Jakarta Sans',Arial,sans-serif;color:#1E1B4B}
+  .rkpr-meta{display:flex;gap:10px;margin:12px 0 14px}
+  .rkpr-meta div{flex:1;background:#F5F6FF;border:1px solid #E3E5F5;border-radius:10px;padding:7px 10px}
+  .rkpr-meta small{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:#6b7280}.rkpr-meta b{font-size:12px}
+  .rkpr-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px}
+  .rkpr-kpi{border:1px solid #E3E5F5;border-left:4px solid #4338CA;border-radius:10px;padding:8px 10px;break-inside:avoid}
+  .rkpr-kpi small{display:block;color:#6b7280;font-size:10px}.rkpr-kpi b{font:800 18px 'Space Grotesk',Arial,sans-serif;color:#1E1B4B}
+  .rkpr-h2{font:800 13px 'Space Grotesk','Plus Jakarta Sans',Arial,sans-serif;color:#1E1B4B;margin:14px 0 6px;padding-left:8px;border-left:4px solid #F43F73}
+  .rkpr-tbl{width:100%;border-collapse:collapse;font-size:11px}
+  .rkpr-tbl thead{display:table-header-group}
+  .rkpr-tbl th{background:#4338CA!important;color:#fff!important;text-align:left;padding:7px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.6px}
+  .rkpr-tbl td{padding:6px 8px;border-bottom:1px solid #E3E5F5;vertical-align:top}
+  .rkpr-tbl tr{break-inside:avoid}.rkpr-tbl tbody tr:nth-child(even) td{background:#F7F8FF!important}
+  .rkpr-tbl tfoot td{font-weight:800;border-top:2px solid #4338CA;background:#EEF0FF!important}
+  .rkpr-empty{padding:18px;text-align:center;color:#6b7280;border:1px dashed #C7C9FF;border-radius:10px}
+  .rkpr-sign{display:flex;gap:28px;margin-top:38px;break-inside:avoid}
+  .rkpr-sign div{flex:1;border-top:1px solid #111827;padding-top:5px;text-align:center;font-size:10.5px;color:#374151}
+  .rkpr-foot{display:none}
+}
+
+/* ================= CHATBOT: Shadow Hunter assistant (original character) ================= */
+.chat-fab{width:62px!important;height:62px!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important;animation:rkc9Bob 3.2s ease-in-out infinite}
+@keyframes rkc9Bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.rkc-av{position:relative;width:100%;height:100%;border-radius:50%;display:block}
+.rkc-av>svg,.rkc-av>img{width:100%;height:100%;border-radius:50%;display:block;object-fit:cover;position:relative;z-index:2;border:2px solid #A855F7;box-shadow:0 0 18px rgba(168,85,247,.75)}
+.rkc-av::before,.rkc-av::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(168,85,247,.55);animation:rkc9Aura 2.2s ease-out infinite;z-index:1}
+.rkc-av::after{animation-delay:1.1s}
+@keyframes rkc9Aura{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.55);opacity:0}}
+.rk-eye{fill:#D8B4FE;filter:drop-shadow(0 0 3px #C084FC);animation:rkc9Blink 4.5s infinite;transform-origin:center;transform-box:fill-box}
+@keyframes rkc9Blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.chat-fab:hover .rkc-av>svg{box-shadow:0 0 30px rgba(216,180,254,.95)}
+.chat-fab:hover .rk-eye{fill:#fff}
+#rkChat{width:min(380px,calc(100vw - 24px))!important;max-height:min(600px,calc(100vh - 120px))!important;border:0!important;border-radius:22px!important;background:#0D0818!important;color:#EDE9FE;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(168,85,247,.5),0 24px 70px rgba(76,29,149,.55),0 0 60px rgba(168,85,247,.25)!important;transform-origin:bottom left}
+#rkChat.show{animation:rkc9Summon .65s cubic-bezier(.2,1.3,.4,1) both!important}
+@keyframes rkc9Summon{0%{opacity:0;transform:scale(.55) translateY(30px);filter:blur(10px) brightness(2)}60%{filter:blur(0) brightness(1.4)}100%{opacity:1;transform:none;filter:none}}
+#rkChat .chat-head{background:linear-gradient(135deg,#2E1065,#4C1D95 55%,#0D0818)!important;padding:12px 14px!important;gap:10px!important;position:relative;overflow:hidden}
+#rkChat .chat-head .rkc-av{width:46px;height:46px;flex:none}
+.rkc-t b{display:block;font:700 14px 'Space Grotesk','Plus Jakarta Sans',sans-serif;letter-spacing:.2px;color:#fff}
+.rkc-t small{font-size:10.5px;color:#C4B5FD}.rkc-t small::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ADE80;margin-right:5px;box-shadow:0 0 8px #4ADE80;animation:rkc9PulseDot 1.6s infinite}
+@keyframes rkc9PulseDot{50%{opacity:.35}}
+#rkChat .chat-head>.rkc-t{flex:1}
+.rkc-up{cursor:pointer;opacity:.8;font-size:15px;line-height:1}.rkc-up:hover{opacity:1}
+#rkChat .chat-body{background:radial-gradient(500px 300px at 50% 0,rgba(124,58,237,.22),transparent 70%),#0D0818!important;max-height:none!important;min-height:200px;scroll-behavior:smooth;position:relative}
+#rkChat .chat-body::-webkit-scrollbar{width:6px}#rkChat .chat-body::-webkit-scrollbar-thumb{background:#6D28D9;border-radius:6px}
+#rkChat .chat-msg{animation:rkc9Msg .35s cubic-bezier(.2,1.3,.4,1) both;font-size:12.6px!important}
+@keyframes rkc9Msg{from{opacity:0;transform:translateY(10px) scale(.96)}}
+#rkChat .chat-msg.bot{background:rgba(124,58,237,.16)!important;border:1px solid rgba(168,85,247,.45)!important;color:#EDE9FE!important;box-shadow:0 0 14px rgba(124,58,237,.18)}
+#rkChat .chat-msg.user{background:linear-gradient(135deg,#7C3AED,#C026D3)!important;color:#fff!important;box-shadow:0 6px 18px rgba(147,51,234,.4)}
+.rkc-typing{align-self:flex-start;display:flex;gap:5px;padding:10px 14px;border-radius:14px;background:rgba(124,58,237,.16);border:1px solid rgba(168,85,247,.45)}
+.rkc-typing i{width:7px;height:7px;border-radius:50%;background:#C084FC;animation:rkc9Dot 1s infinite}.rkc-typing i:nth-child(2){animation-delay:.15s}.rkc-typing i:nth-child(3){animation-delay:.3s}
+@keyframes rkc9Dot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+#rkChat .chat-quick{background:#0D0818;padding:8px 12px 10px!important}
+#rkChat .chat-quick span{background:rgba(124,58,237,.18)!important;color:#DDD6FE!important;border:1px solid rgba(168,85,247,.5);transition:transform .2s,box-shadow .2s}
+#rkChat .chat-quick span:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 0 14px rgba(168,85,247,.7)}
+#rkChat .chat-input-wrap{background:#140B26;border-top:1px solid rgba(168,85,247,.35)!important}
+#rkChat .chat-input-wrap input{color:#fff!important}#rkChat .chat-input-wrap input::placeholder{color:#A78BFA}
+#rkChat .chat-input-wrap button{color:#fff!important;background:linear-gradient(135deg,#7C3AED,#C026D3)!important;border-radius:12px;padding:6px 10px!important}
+.rkc-embers{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.rkc-embers i{position:absolute;bottom:-8px;width:4px;height:4px;border-radius:50%;background:#C084FC;box-shadow:0 0 8px #A855F7;opacity:0;animation:rkc9Ember 5s linear infinite}
+@keyframes rkc9Ember{0%{transform:translateY(0) scale(1);opacity:0}15%{opacity:.9}100%{transform:translateY(-110px) translateX(14px) scale(.3);opacity:0}}
+.rkc-rune{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0D0818;z-index:5;animation:rkc9RuneOut 1s ease-in .7s forwards;pointer-events:none}
+.rkc-rune svg{width:170px;height:170px;animation:rkc9Spin 2.2s linear infinite;filter:drop-shadow(0 0 10px #A855F7)}
+@keyframes rkc9Spin{to{transform:rotate(360deg)}}@keyframes rkc9RuneOut{to{opacity:0;visibility:hidden}}
+@media(prefers-reduced-motion:reduce){.chat-fab,.rkc-av::before,.rkc-av::after,.rk-eye,.rkc-embers i,.rkc-rune svg{animation:none!important}}
+</style>
+<style id="rk-auth-extra">
+/* ===== Staff registration + admin user management (ported from the Student Conduct app) ===== */
+#loginScreen.rk-reg{align-items:flex-start;overflow-y:auto}
+#loginScreen.rk-reg .login-card{margin:24px auto!important}
+.reg-title{font-size:17px;font-weight:800;color:#0B1F5C;text-align:center;margin:2px 0 2px}
+.reg-sub{font-size:12px;color:#5B6B8C;text-align:center;margin-bottom:14px}
+html body select.login-input{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:38px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path fill='%235B6B8C' d='M7 10l5 5 5-5z'/></svg>")!important;
+  background-repeat:no-repeat!important;background-position:right 14px center!important}
+select.login-input option{color:#0B1F5C;background:#fff}
+.login-ok{display:none;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:#E6F9F1;color:#0F7A4F;font-size:12.5px;font-weight:600;text-align:center}
+.login-switch{text-align:center;font-size:12.5px;color:#5B6B8C;margin-top:2px}
+.login-switch a{color:#0B47E8;font-weight:700;cursor:pointer;text-decoration:none}
+.login-switch a:hover{text-decoration:underline}
+.login-note{text-align:center;font-size:11px;color:#8A9BBF;margin-top:10px}
+.usr-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#EF4444;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center}
+.usr-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;text-transform:capitalize}
+.usr-pill.pending{background:rgba(245,158,11,.16);color:#B45309}
+.usr-pill.approved{background:rgba(16,185,129,.16);color:#047857}
+.usr-pill.rejected{background:rgba(239,68,68,.16);color:#B91C1C}
+.usr-empty{padding:18px;text-align:center;color:var(--text3,#8a94a6);font-size:13px}
+.usr-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.usr-act select{padding:5px 8px;border-radius:8px;border:1px solid var(--border2,#d6dbe6);background:var(--surface,#fff);color:inherit;font-size:12px}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&display=swap">
+<style id="rk-ptserif">
+/* PT Serif for headings only; body, tables, forms stay Inter */
+html body .login-title,html body .reg-title,html body .page-header h1,html body .modal-title,
+html body .sidebar-brand-name,html body .mcard-title,html body .topbar-title{font-family:'PT Serif',Georgia,'Times New Roman',serif!important;letter-spacing:0!important}
+html body .login-title,html body .page-header h1{font-weight:700!important}
+</style>
 </head>
 <body>
 
@@ -1192,15 +1305,45 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
     <div class="login-title">RKMS MediStock Pro</div>
     <div class="login-sub">Ramakrishna Mission Health Center</div>
     <div id="lout-msg" style="display:none;margin:0 0 12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:600;text-align:center"><span class="material-icons-round" style="font-size:15px;vertical-align:middle">check_circle</span> You are logged out. Please sign in again to continue.</div>
+    <div id="loginForm">
     <div class="role-tabs">
       <button class="role-tab active" onclick="setRole('admin',this)"><span class="material-icons-round" style="font-size:14px">shield</span> Admin</button>
       <button class="role-tab" onclick="setRole('doctor',this)"><span class="material-icons-round" style="font-size:14px">medical_services</span> Staff Console</button>
       <button class="role-tab" onclick="setRole('nurse',this)"><span class="material-icons-round" style="font-size:14px">medication</span> Medical Ward Console</button>
     </div>
-    <input class="login-input" type="text" id="lu" placeholder="Username" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <input class="login-input" type="text" id="lu" placeholder="Username / Email" autocomplete="off" autocapitalize="none" spellcheck="false">
     <input class="login-input" type="password" id="lp" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="lerr"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">error</span> Wrong username or password!</div>
     <button class="login-btn" onclick="doLogin()"><span class="material-icons-round" style="font-size:18px">lock</span> Login to RKMS</button>
+    <div class="login-switch">Staff / Medical Ward? <a onclick="rkShowRegister()">Register here</a></div>
+    </div>
+    <div id="regForm" style="display:none">
+      <div class="reg-title">Staff Registration</div>
+      <div class="reg-sub">Request access to MediStock Pro</div>
+      <input class="login-input" type="text" id="rg-name" placeholder="Full Name *" autocomplete="off">
+      <input class="login-input" type="text" id="rg-user" placeholder="Choose a username *" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input class="login-input" type="email" id="rg-email" placeholder="Email (optional)" autocomplete="off">
+      <select class="login-input" id="rg-role">
+        <option value="">Staff / Medical Ward — select</option>
+        <option value="doctor">Staff Console</option>
+        <option value="nurse">Medical Ward Console</option>
+      </select>
+      <select class="login-input" id="rg-dept">
+        <option value="">Department — select</option>
+        <option>Mechanical (DME)</option>
+        <option>Automobile (DAE)</option>
+        <option>Computer (DCE)</option>
+        <option>Common / Other</option>
+      </select>
+      <input class="login-input" type="text" id="rg-desig" placeholder="Designation (e.g. Class Teacher, Mentor, HOD)" autocomplete="off">
+      <input class="login-input" type="password" id="rg-pass" placeholder="Password * (min 6 characters)" autocomplete="new-password">
+      <input class="login-input" type="password" id="rg-pass2" placeholder="Confirm Password *" autocomplete="new-password" onkeydown="if(event.key==='Enter')rkRegister()">
+      <div class="login-err" id="rg-err"></div>
+      <div class="login-ok" id="rg-ok"></div>
+      <button class="login-btn" id="rg-btn" onclick="rkRegister()"><span class="material-icons-round" style="font-size:18px">how_to_reg</span> Submit Registration</button>
+      <div class="login-switch">Already registered? <a onclick="rkShowLogin()">Login here</a></div>
+      <div class="login-note">Registration requires Admin approval before login.</div>
+    </div>
   </div>
 </div>
 
@@ -1242,6 +1385,7 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
     <button class="nav-item" onclick="showTab('birthdays')" id="tab-birthdays"><span class="material-icons-round">cake</span> Birthdays</button>
     <button class="nav-item" onclick="showTab('noticeboard')" id="tab-noticeboard"><span class="material-icons-round">push_pin</span> Notice Board</button>
     <button class="nav-item" onclick="showTab('actlog')" id="tab-actlog"><span class="material-icons-round">article</span> Activity Log</button>
+    <button class="nav-item" onclick="showTab('users')" id="tab-users"><span class="material-icons-round">manage_accounts</span> Users <span id="users-badge" class="usr-badge" style="display:none">0</span></button>
   </nav>
 
   <div class="sidebar-footer">
@@ -1386,7 +1530,7 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
   <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">person_search</span> Search Student</div></div>
     <div class="mcard-body">
       <div class="ac-wrap">
-        <div class="search-wrap" style="margin-bottom:0"><span class="material-icons-round search-icon">search</span><input class="search-input" type="text" id="ds" placeholder="Type student name..." oninput="searchAC(this.value)" autocomplete="off"></div>
+        <div class="search-wrap" style="margin-bottom:0"><span class="material-icons-round search-icon">search</span><input class="search-input" type="text" id="ds" placeholder="Type student name..." oninput="searchAC(this.value)" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
         <div class="ac-dropdown" id="acl"></div>
       </div>
       <div id="d-prof" style="display:none">
@@ -1518,6 +1662,17 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
   <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">article</span> Log</div><button class="mbtn danger sm" onclick="clearLog()"><span class="material-icons-round">delete</span> Clear</button></div><div class="mcard-body" id="log-body"></div></div>
 </div>
 
+<!-- ====== USER MANAGEMENT (admin) ====== -->
+<div class="page-section" id="sec-users">
+  <div class="page-header"><h1>🔐 User Management</h1><p>Approve staff registrations and manage logins</p></div>
+  <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">pending_actions</span> Pending Approvals</div><button class="mbtn sm" onclick="rkRenderUsers()"><span class="material-icons-round">refresh</span> Refresh</button></div>
+    <div class="table-wrap" id="usr-pending"></div>
+  </div>
+  <div class="mcard"><div class="mcard-head"><div class="mcard-title"><span class="material-icons-round">groups</span> All Users</div><button class="mbtn danger sm" onclick="rkUsrResetAll()"><span class="material-icons-round">person_remove</span> Reset users</button></div>
+    <div class="table-wrap" id="usr-all"></div>
+  </div>
+</div>
+
 </div><!-- end content-area -->
 </div><!-- end main-content -->
 </div><!-- end app-wrap -->
@@ -1610,7 +1765,7 @@ var meds=[],stus=[],hist=[],log=[],docs=[],notices=[],medRows=[];
 var editMedId=null,restockId=null,editStuId=null,selStu=null,catFilter='All';
 var dark=false,adminPW='admin123',selRole='admin',curProfileId=null,currentTab='dashboard';
 var ROLE_TABS={
-  admin:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard','actlog'],
+  admin:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard','actlog','users'],
   doctor:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard'],
   nurse:['dashboard','medicines','students','dispense','prescription','history','daily','calendar','birthdays','noticeboard'],
   staff:['dashboard','medicines','doctors','students','dispense','prescription','history','daily','analytics','stockval','calendar','birthdays','noticeboard','actlog']
@@ -1704,8 +1859,8 @@ function applyLogo(url){
 }
 function uploadLogo(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){var url=e.target.result;localStorage.setItem('ms_logo',url);applyLogo(url);};r.readAsDataURL(f);}
 function saveSettings(){var cn=document.getElementById('set-college').value.trim();if(cn){localStorage.setItem('ms_college',cn);document.getElementById('cn-display').textContent=cn;}var gd=document.getElementById('set-gdrive').value.trim();if(gd){localStorage.setItem('ms_gdrive',gd);document.getElementById('gdrive-top-link').href=gd;document.getElementById('gdrive-btn').href=gd;}var cur=document.getElementById('pw-cur').value,nw=document.getElementById('pw-new').value,cn2=document.getElementById('pw-con').value,err=document.getElementById('pw-err');if(nw){if(cur!==adminPW){err.style.display='block';err.textContent='Wrong current password';return;}if(nw.length<4){err.style.display='block';err.textContent='Min 4 chars';return;}if(nw!==cn2){err.style.display='block';err.textContent='Passwords do not match';return;}adminPW=nw;localStorage.setItem('ms_pw',nw);err.style.display='none';alert('✅ Password updated!');}closeModal('settings-modal');addLog('Settings saved');}
-var TABS={dashboard:'Dashboard',medicines:'Medicines',doctors:'Doctors',students:'Students',dispense:'Dispense Medicine',prescription:'Prescription',history:'Dispense History',daily:'Daily Report',analytics:'Analytics',stockval:'Stock Value',calendar:'Calendar View',birthdays:'Birthdays',noticeboard:'Notice Board',actlog:'Activity Log'};
-var ICONS={dashboard:'dashboard',medicines:'medication',doctors:'medical_services',students:'groups',dispense:'assignment',prescription:'description',history:'history',daily:'today',analytics:'bar_chart',stockval:'currency_rupee',calendar:'calendar_month',birthdays:'cake',noticeboard:'push_pin',actlog:'article'};
+var TABS={dashboard:'Dashboard',medicines:'Medicines',doctors:'Doctors',students:'Students',dispense:'Dispense Medicine',prescription:'Prescription',history:'Dispense History',daily:'Daily Report',analytics:'Analytics',stockval:'Stock Value',calendar:'Calendar View',birthdays:'Birthdays',noticeboard:'Notice Board',actlog:'Activity Log',users:'User Management'};
+var ICONS={dashboard:'dashboard',medicines:'medication',doctors:'medical_services',students:'groups',dispense:'assignment',prescription:'description',history:'history',daily:'today',analytics:'bar_chart',stockval:'currency_rupee',calendar:'calendar_month',birthdays:'cake',noticeboard:'push_pin',actlog:'article',users:'manage_accounts'};
 function showTab(t){
   var allowed=ROLE_TABS[selRole]||ROLE_TABS.admin;
   if(allowed.indexOf(t)===-1){
@@ -1732,6 +1887,7 @@ function showTab(t){
   if(t==='birthdays')renderBirthdays();
   if(t==='noticeboard')renderNotices();
   if(t==='actlog')renderLog();
+  if(t==='users'&&window.rkRenderUsers)window.rkRenderUsers();
   if(t==='dispense'){updateDMed();updateDDoc();initMedRows();}
 }
 function openModal(id){document.getElementById(id).classList.add('show');}
@@ -5206,6 +5362,103 @@ window.onGoogleLogin = async function(resp){
     e.textContent=err.message||'Google login failed'; e.style.display='block';
   }
 };
+// ---------- staff registration + admin user management (ported from the Student Conduct app) ----------
+function $id(i){return document.getElementById(i)}
+function rgVal(i){return ($id(i).value||'').trim()}
+window.rkShowRegister=function(){
+  $id('loginForm').style.display='none'; $id('regForm').style.display='block';
+  $id('rg-err').style.display='none'; $id('rg-ok').style.display='none';
+  var lm=$id('lout-msg'); if(lm)lm.style.display='none';
+  var ls=$id('loginScreen'); ls.classList.add('rk-reg'); ls.scrollTop=0;
+};
+window.rkShowLogin=function(){
+  $id('regForm').style.display='none'; $id('loginForm').style.display='block';
+  $id('lerr').style.display='none';
+  var ls=$id('loginScreen'); ls.classList.remove('rk-reg'); ls.scrollTop=0;
+};
+window.rkRegister=async function(){
+  var err=$id('rg-err'), ok=$id('rg-ok'), btn=$id('rg-btn');
+  err.style.display='none'; ok.style.display='none';
+  function fail(m){err.textContent=m; err.style.display='block';}
+  var name=rgVal('rg-name'), user=rgVal('rg-user'), p1=$id('rg-pass').value, p2=$id('rg-pass2').value;
+  if(!name||!user||!p1){fail('Name, Username and Password are required');return;}
+  if(!$id('rg-role').value){fail('Select Staff or Medical Ward');return;}
+  if(p1.length<6){fail('Password must be at least 6 characters');return;}
+  if(p1!==p2){fail('Passwords do not match');return;}
+  btn.disabled=true;
+  try{
+    var res=await fetch(API_BASE+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:name,username:user,email:rgVal('rg-email'),dept:$id('rg-dept').value,designation:rgVal('rg-desig'),role:$id('rg-role').value,password:p1})});
+    var j={}; try{j=await res.json();}catch(_){}
+    if(!res.ok){
+      var d=j.detail; if(Array.isArray(d))d=d.map(function(x){return x.msg}).join(', ');
+      fail(typeof d==='string'&&d?d:'Registration failed ('+res.status+')'); return;
+    }
+    ok.textContent=j.message||'Registration submitted! Wait for Admin approval, then login.'; ok.style.display='block';
+    ['rg-name','rg-user','rg-email','rg-desig','rg-pass','rg-pass2'].forEach(function(id){$id(id).value=''});
+    $id('rg-dept').value='';
+  }catch(e){ fail('Cannot reach server. Is the backend running?'); }
+  finally{ btn.disabled=false; }
+};
+
+var usrCache=[];
+function setUsersBadge(n){var b=$id('users-badge'); if(!b)return; b.textContent=n; b.style.display=n>0?'inline-flex':'none';}
+window.rkPendingBadge=function(me){ if(me&&me.role==='admin'&&typeof me.pending_users==='number')setUsersBadge(me.pending_users); };
+function rkRefreshPending(){ if(!authToken)return; apiGet('/auth/me').then(window.rkPendingBadge).catch(function(){}); }
+var _ara=window.applyRoleAccess;
+window.applyRoleAccess=function(role){
+  var r=_ara.apply(this,arguments);
+  if(role==='admin'){ rkRefreshPending(); if(!window.__rkPendTimer)window.__rkPendTimer=setInterval(function(){ if(authToken&&selRole==='admin')rkRefreshPending(); },120000); }
+  return r;
+};
+var ROLE_NAME={admin:'Admin',doctor:'Staff Console',nurse:'Medical Ward Console'};
+function usrDate(iso){try{return new Date(iso).toLocaleDateString('en-IN')}catch(e){return ''}}
+window.rkRenderUsers=async function(){
+  var pe=$id('usr-pending'), ae=$id('usr-all'); if(!pe||!ae)return;
+  try{ usrCache=await apiGet('/auth/users'); }
+  catch(e){ pe.innerHTML='<div class="usr-empty">'+esc2(e.message)+'</div>'; ae.innerHTML=''; return; }
+  var pend=usrCache.filter(function(u){return u.status==='pending'});
+  setUsersBadge(pend.length);
+  if(!pend.length){ pe.innerHTML='<div class="usr-empty">No pending registrations</div>'; }
+  else{
+    pe.innerHTML='<table class="mtable"><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Dept</th><th>Designation</th><th>Requested</th><th>Action</th></tr></thead><tbody>'+
+      pend.map(function(u){var id=Number(u.id);
+        return '<tr><td>'+esc2(u.name)+'</td><td>'+esc2(u.username)+'</td><td>'+esc2(u.email||'—')+'</td><td>'+esc2(u.dept||'—')+'</td><td>'+esc2(u.designation||'—')+'</td>'+
+          '<td>'+esc2(usrDate(u.created_at))+'</td><td><div class="usr-act">'+
+          '<select id="usr-role-'+id+'"><option value="doctor"'+(u.role==='doctor'?' selected':'')+'>Staff Console</option><option value="nurse"'+(u.role==='nurse'?' selected':'')+'>Medical Ward Console</option></select>'+
+          '<button class="mbtn primary sm" onclick="rkUsrApprove('+id+')">Approve</button><button class="mbtn danger sm" onclick="rkUsrReject('+id+')">Reject</button></div></td></tr>';
+      }).join('')+'</tbody></table>';
+  }
+  ae.innerHTML='<table class="mtable"><thead><tr><th>#</th><th>Name</th><th>Username</th><th>Role</th><th>Dept</th><th>Status</th><th>Action</th></tr></thead><tbody>'+
+    usrCache.map(function(u,i){var id=Number(u.id), owner=u.username==='admin';
+      return '<tr><td>'+(i+1)+'</td><td>'+esc2(u.name)+(u.google?' <span title="Google connected" style="font-size:11px;opacity:.7">· G</span>':'')+'</td><td>'+esc2(u.username)+'</td><td>'+esc2(ROLE_NAME[u.role]||u.role)+'</td><td>'+esc2(u.dept||'—')+'</td>'+
+        '<td><span class="usr-pill '+esc2(u.status)+'">'+esc2(u.status)+'</span></td><td>'+
+        (owner?'—':'<button class="mbtn danger sm" onclick="rkUsrDelete('+id+')">Remove</button>')+'</td></tr>';
+    }).join('')+'</tbody></table>';
+};
+window.rkUsrApprove=async function(id){
+  var sel=$id('usr-role-'+id);
+  try{ await apiPostJSON('/auth/users/'+id+'/approve', sel?{role:sel.value}:{}); toast('User approved','success'); }
+  catch(e){ toast(e.message||'Could not approve','error'); }
+  window.rkRenderUsers();
+};
+window.rkUsrReject=async function(id){
+  try{ await apiPostJSON('/auth/users/'+id+'/reject',{}); toast('Registration rejected','success'); }
+  catch(e){ toast(e.message||'Could not reject','error'); }
+  window.rkRenderUsers();
+};
+window.rkUsrDelete=async function(id){
+  if(!confirm('Remove this user?'))return;
+  try{ await apiDelete('/auth/users/'+id); toast('User removed','success'); }
+  catch(e){ toast(e.message||'Could not remove','error'); }
+  window.rkRenderUsers();
+};
+window.rkUsrResetAll=async function(){
+  if(!confirm('Remove ALL users except the owner (admin)? This cannot be undone.'))return;
+  try{ var r=await apiPostJSON('/auth/users/reset',{}); toast('Users reset ('+((r&&r.removed)||0)+' removed)','success'); }
+  catch(e){ toast(e.message||'Could not reset users','error'); }
+  window.rkRenderUsers();
+};
 // ---------- session restore + single-login heartbeat + per-user Google Drive backup ----------
 var hbTimer=null, driveTimer=null, driveTok=null, driveExp=0, tokClient=null;
 function jwtSub(){try{return JSON.parse(atob(authToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub}catch(e){return 'user'}}
@@ -5544,15 +5797,23 @@ window.addLog = function(msg,type){
 };
 
 // ---------- Settings: password changes now belong to the backend ----------
-window.saveSettings = function(){
+window.saveSettings = async function(){
   var cn=document.getElementById('set-college').value.trim();
   if(cn){localStorage.setItem('ms_college',cn);document.getElementById('cn-display').textContent=cn;}
   var gd=document.getElementById('set-gdrive').value.trim();
   if(gd){localStorage.setItem('ms_gdrive',gd);document.getElementById('gdrive-top-link').href=gd;document.getElementById('gdrive-btn').href=gd;}
-  var nw=document.getElementById('pw-new').value, err=document.getElementById('pw-err');
-  if(nw){
-    err.style.display='block';
-    err.textContent='User passwords are managed by the backend now — an admin can add/update logins via POST /auth/users (see /docs).';
+  var cur=document.getElementById('pw-cur').value, nw=document.getElementById('pw-new').value, con=document.getElementById('pw-con').value;
+  var err=document.getElementById('pw-err'); err.style.display='none';
+  if(cur||nw||con){
+    var bad=function(m){err.textContent=m;err.style.display='block';};
+    if(!cur||!nw){bad('Enter your current and new password');return;}
+    if(nw.length<6){bad('New password must be at least 6 characters');return;}
+    if(nw!==con){bad('New passwords do not match');return;}
+    try{
+      await apiPostJSON('/auth/change-password',{current_password:cur,new_password:nw});
+      toast('Password updated','success');
+      ['pw-cur','pw-new','pw-con'].forEach(function(id){document.getElementById(id).value='';});
+    }catch(e){bad(e.message||'Could not change password');return;}
   }
   closeModal('settings-modal'); addLog('Settings saved');
 };
@@ -6258,11 +6519,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function mix(a,b,t){var x=rgb(a),y=rgb(b);return '#'+x.map(function(v,i){return ('0'+Math.round(v*(1-t)+y[i]*t).toString(16)).slice(-2)}).join('')}
   function apply(i,sv){
     var P=PAL[i]||PAL[0],r=document.documentElement.style;
-    r.setProperty('--primary',P.p);r.setProperty('--primary-dark',mix(P.p,'#000000',.3));r.setProperty('--primary-light',mix(P.p,'#ffffff',.9));r.setProperty('--primary-mid',mix(P.p,'#ffffff',.6));
+    r.setProperty('--primary',P.p);window.__rkP=P.p;r.setProperty('--primary-dark',mix(P.p,'#000000',.3));r.setProperty('--primary-light',mix(P.p,'#ffffff',.9));r.setProperty('--primary-mid',mix(P.p,'#ffffff',.6));
     r.setProperty('--pg-dark',P.p);r.setProperty('--rk-a',P.p);r.setProperty('--rk-b',P.s);r.setProperty('--rk-c',P.a);
     r.setProperty('--rk-bg',P.bg);r.setProperty('--rk-text',P.tx);r.setProperty('--rk-bg1',P.b1);r.setProperty('--rk-bg2',P.b2);r.setProperty('--rk-bg3',P.b3);
     var m=document.querySelector('meta[name=theme-color]');if(m)m.content=P.p;
-    if(sv&&hasLS)try{localStorage.setItem('rk_pal',i);localStorage.removeItem('ms_theme_idx');localStorage.removeItem('ms_theme_custom')}catch(e){}
+    if(sv&&hasLS)try{localStorage.setItem('rk_pal',i);localStorage.removeItem('rk_user_accent');localStorage.removeItem('ms_theme_idx');localStorage.removeItem('ms_theme_custom')}catch(e){}
     paint(i);
   }
   function paint(i){
@@ -6369,12 +6630,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rk-ui-v8-js">
 (function(){
   function boot(){
-    var i=null;try{var v=localStorage.getItem('rk_pal');if(v!==null)i=+v;else if(localStorage.getItem('ms_theme_idx')===null)i=0}catch(e){}
+    var i=null;try{var v=localStorage.getItem('rk_pal');if(v!==null)i=+v;else if(localStorage.getItem('rk_user_accent')===null)i=0}catch(e){}
     if(i!==null&&window.rkApplyPalette)window.rkApplyPalette(i);
   }
   if(document.readyState==='complete')boot();else addEventListener('load',function(){boot();setTimeout(boot,60)});
   /* picking a colour in Settings > Accent Theme means the user wants that one: forget the studio choice */
-  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.tswatch,#themeSwatchWrap'))try{localStorage.removeItem('rk_pal')}catch(_){}});
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.tswatch,#themeSwatchWrap'))try{localStorage.removeItem('rk_pal');localStorage.setItem('rk_user_accent','1')}catch(_){}});
 })();
 </script>
 <style id="rk-opening-v3">
@@ -7238,6 +7499,7 @@ if(!app||!sec)return;
 
 /* ---- preferences (saved in this browser) ---- */
 var TH={
+  pharmly:{n:'Pharmly',c:['#0B6B57','#14B8A6','#C8E62B'],ink:'#012B24'},
   aurora:{n:'Aurora',c:['#6366F1','#22D3EE','#F472B6'],ink:'#0F1226'},
   ocean:{n:'Ocean',c:['#0EA5E9','#14B8A6','#6366F1'],ink:'#08202E'},
   emerald:{n:'Emerald',c:['#10B981','#84CC16','#06B6D4'],ink:'#062A22'},
@@ -7247,8 +7509,8 @@ var TH={
 };
 var WIDGETS=[['trend','Dispensing trend'],['status','Stock status'],['med','Top medicines'],['dept','Department usage'],['year','Student year usage'],
   ['activity','Daily activity'],['tree','Stock value treemap'],['runway','Expiry runway'],['table','Medicine watchlist'],['feeds','Recent, visitors, birthdays']];
-var P={theme:'aurora',bg:'aurora',anim:true,compact:false,glass:true,sbTheme:false,demo:false,hide:{}};
-try{var sv=JSON.parse(localStorage.getItem('rkp_prefs')||'null');if(sv)for(var k0 in sv)P[k0]=sv[k0]}catch(e){}
+var P={theme:'pharmly',bg:'aurora',anim:true,compact:false,glass:true,sbTheme:true,demo:false,hide:{}};
+try{var sv=JSON.parse(localStorage.getItem('rkp_prefs')||'null');if(sv)for(var k0 in sv)P[k0]=sv[k0];if(localStorage.getItem('rkp_ph1')!=='1'){P.theme='pharmly';P.sbTheme=true;localStorage.setItem('rkp_ph1','1');localStorage.setItem('rkp_prefs',JSON.stringify(P))}}catch(e){}
 function savePrefs(){try{localStorage.setItem('rkp_prefs',JSON.stringify(P))}catch(e){}}
 var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
 function applyPrefs(){
@@ -7259,6 +7521,7 @@ function applyPrefs(){
   var cs=[t.c[0],t.c[1],t.c[2],'#F59F00','#E8590C','#3B9AE1','#845EF7','#0CA678'];
   cs.forEach(function(c,i){s.setProperty('--c'+(i+1),c)});
   var cl=b.classList;
+  Object.keys(TH).forEach(function(k){cl.toggle('rkp-th-'+k,P.theme===k)});
   ['aurora','grid','plain'].forEach(function(x){cl.toggle('rkp-bg-'+x,P.bg===x)});
   cl.toggle('rkp-noanim',!P.anim||reduce);cl.toggle('rkp-compact',!!P.compact);cl.toggle('rkp-glass',!!P.glass);cl.toggle('rkp-sbtheme',!!P.sbTheme);
 }
@@ -7968,7 +8231,7 @@ function openCustom(){
       else if(c==='bg')P.bg=v;
       else if(c==='opt'){P[v]=!P[v];if(v==='demo')FIRST=true}
       else if(c==='widget'){if(P.hide[v])delete P.hide[v];else P.hide[v]=1}
-      else if(c==='reset'){P={theme:'aurora',bg:'aurora',anim:true,compact:false,glass:true,sbTheme:false,demo:false,hide:{}}}
+      else if(c==='reset'){P={theme:'pharmly',bg:'aurora',anim:true,compact:false,glass:true,sbTheme:true,demo:false,hide:{}}}
       savePrefs();applyPrefs();drawCustom();SWEEP=true;render(true,'filter');
     });
   }
@@ -7990,6 +8253,210 @@ if(visible())render();
 window.rkpRender=function(){render(true)};
 })();
 
+</script>
+<style id="rk-pharmly-v6">
+/* ===== RKMS v6: Pharmly theme for the dashboard (dark green + lime, Power BI-grade visuals) ===== */
+body.rkp.rkp-th-pharmly{--bg:#EEF4F1;--surface:#FFFFFF;--surface2:#F5F9F7;--surface3:#E8F0EC;--text:#10241F;--text2:#3F544C;--text3:#62786F;--border:#D9E5DF;--border2:#C2D3CA;--ink2:#03382F;
+ --shadow:0 1px 2px rgba(1,43,36,.05);--shadow-md:0 8px 24px rgba(1,43,36,.08);--shadow-lg:0 22px 50px rgba(1,43,36,.16)}
+body.rkp.rkp-th-pharmly.dark-mode{--bg:#06130F;--surface:#0D1F1A;--surface2:#112922;--surface3:#17342C;--text:#E6F3EE;--text2:#A8C2B8;--text3:#7B968B;--border:#1D3A31;--border2:#2A4A3F}
+body.rkp.rkp-th-pharmly *:not(.material-icons-round):not(.material-icons){font-family:'Plus Jakarta Sans','Inter',system-ui,sans-serif}
+/* sidebar: template look, lime active item */
+body.rkp.rkp-th-pharmly .nav-item.active{background:#D4F038!important;color:#012B24!important;font-weight:700;box-shadow:0 8px 22px rgba(212,240,56,.28)}
+body.rkp.rkp-th-pharmly .nav-item.active *{color:#012B24!important}
+body.rkp.rkp-th-pharmly .nav-item{transition:background .18s,transform .18s}body.rkp.rkp-th-pharmly .nav-item:not(.active):hover{transform:translateX(3px)}
+/* animated background */
+body.rkp.rkp-th-pharmly #rkp-bg i:nth-child(1){background:#0B6B57}body.rkp.rkp-th-pharmly #rkp-bg i:nth-child(2){background:#C8E62B}body.rkp.rkp-th-pharmly #rkp-bg i:nth-child(3){background:#14B8A6}
+#rk-fx{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none}
+body.rkp.rkp-th-pharmly.rk-fx-on #rk-fx{display:block}
+/* hero */
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head{position:relative;overflow:hidden;border-radius:24px;padding:22px 26px 52px;color:#fff;isolation:isolate;
+ background:radial-gradient(520px 260px at 92% 0%,rgba(212,240,56,.30),transparent 62%),linear-gradient(118deg,#012B24 0%,#07493C 58%,#0E7A64 100%);box-shadow:var(--shadow-lg)}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head::before{content:'';position:absolute;inset:auto 0 0 0;height:54px;z-index:-1;opacity:.32;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='54' viewBox='0 0 360 54'%3E%3Cpath d='M0 30H90L100 30L108 10L120 50L130 22L138 30H230L240 30L246 18L254 38L260 30H360' fill='none' stroke='%23D4F038' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") repeat-x;background-size:360px 54px;animation:rkEcgMove 7s linear infinite}
+@keyframes rkEcgMove{to{background-position-x:-360px}}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head h1,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head h2,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head h3{color:#fff;font-weight:800;letter-spacing:-.4px}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head p,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head small,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head div:not(.rkp-actions){color:rgba(255,255,255,.82)}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head .rkp-ibtn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px)}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head .rkp-ibtn:hover{background:#D4F038;color:#012B24;border-color:#D4F038}
+/* cards, slicers, strip */
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-tile{border-radius:22px!important;border:1px solid var(--border);box-shadow:var(--shadow-md);transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-tile{animation-fill-mode:backwards!important}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi{transform:perspective(800px) rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg)) translateY(var(--lift,0px))}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:hover{--lift:-5px;box-shadow:var(--shadow-lg)}body.rkp.rkp-th-pharmly #sec-dashboard .rkp-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-bar,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-note,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-acc{border-radius:18px!important}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-seg button.on,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-seg .on{background:#D4F038!important;color:#012B24!important;font-weight:800}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:first-child{background:linear-gradient(145deg,#012B24,#07493C)!important;border-color:transparent;color:#fff}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:first-child .l{color:rgba(255,255,255,.8)}body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:first-child .v{color:#fff}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:first-child .d span{color:rgba(255,255,255,.66)}body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:first-child .d b.up{color:#D4F038}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:first-child .ki{background:#D4F038!important}body.rkp.rkp-th-pharmly #sec-dashboard .rkp-kpi:first-child .ki *{color:#012B24!important}
+body.rkp.rkp-th-pharmly #sec-dashboard .rkp-hb i,body.rkp.rkp-th-pharmly #sec-dashboard .rkp-hb .b{border-radius:99px}
+/* google strip now sits at the bottom of the dashboard */
+body.rkp #sec-dashboard #rkp-strip{order:9!important;margin-top:22px}
+body.rkp.rkp-th-pharmly #sec-dashboard .gdrive-banner{background:linear-gradient(120deg,#012B24,#0B6B57 70%,#14806A)!important;border-radius:18px!important;color:#fff;box-shadow:var(--shadow-md)}
+body.rkp.rkp-th-pharmly #sec-dashboard .gdrive-banner:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+/* event effects */
+.rk-p{position:fixed;z-index:100002;pointer-events:none;width:8px;height:8px;border-radius:50%;animation:rkBurst .8s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes rkBurst{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+/* top bar: always keep the Google control inside the screen */
+body.rkp .topbar{gap:10px}
+body.rkp .topbar-right{flex:0 1 auto;min-width:0;gap:8px}
+body.rkp .rkp-sb{flex:1 1 220px;min-width:150px;max-width:342px}
+body.rkp .rkp-acct{flex:none}
+@media(max-width:1640px){body.rkp .clock-widget{display:none!important}}
+@media(max-width:1380px){body.rkp .topbar-title{display:none!important}body.rkp .abadge{padding:6px 10px}}
+@media(max-width:1180px){body.rkp .scan-pill{display:none!important}body.rkp .rkp-sb{max-width:220px}}
+@media(prefers-reduced-motion:reduce){body.rkp.rkp-th-pharmly #sec-dashboard .rkp-head::before{animation:none}}
+</style>
+<script>
+/* ---- RKMS v6: floating-capsule background, hover/tilt/burst effects, Google strip to bottom ---- */
+(function(){
+  var B=document.body,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* background capsules + molecules (only on the dashboard, only with animations on) */
+  var cv=document.createElement('canvas');cv.id='rk-fx';cv.setAttribute('aria-hidden','true');
+  var bg=document.getElementById('rkp-bg');(bg&&bg.parentNode?bg.parentNode:B).insertBefore(cv,bg?bg.nextSibling:B.firstChild);
+  var ctx=cv.getContext('2d'),W=0,H=0,items=[],dots=[],last=0;
+  function size(){var d=Math.min(devicePixelRatio||1,1.5);W=cv.width=innerWidth*d;H=cv.height=innerHeight*d;ctx.setTransform(d,0,0,d,0,0);W=innerWidth;H=innerHeight}
+  function seed(){items=[];dots=[];for(var i=0;i<16;i++)items.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*6.28,vr:(Math.random()-.5)*.004,vx:(Math.random()-.5)*.18,vy:-.05-Math.random()*.16,s:.7+Math.random()*.9,c:i%3});
+    for(var j=0;j<34;j++)dots.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22})}
+  function on(){var s=document.getElementById('sec-dashboard');return B.classList.contains('rkp')&&B.classList.contains('rkp-th-pharmly')&&!B.classList.contains('rkp-noanim')&&s&&s.classList.contains('active')&&!document.hidden}
+  function cap(x,y,r,s,c,dark){ctx.save();ctx.translate(x,y);ctx.rotate(r);ctx.scale(s,s);var w=44,h=17,a=dark?.34:.5;
+    ctx.beginPath();ctx.roundRect?ctx.roundRect(-w/2,-h/2,w,h,h/2):ctx.rect(-w/2,-h/2,w,h);ctx.clip();
+    ctx.fillStyle='rgba(255,255,255,'+(dark?.18:.7)+')';ctx.fillRect(-w/2,-h/2,w/2,h);ctx.fillStyle=['rgba(20,184,166,','rgba(200,230,43,','rgba(11,107,87,'][c]+a+')';ctx.fillRect(0,-h/2,w/2,h);ctx.restore()}
+  function loop(t){requestAnimationFrame(loop);var shouldOn=on();B.classList.toggle('rk-fx-on',shouldOn);if(!shouldOn||t-last<33)return;last=t;
+    var dark=B.classList.contains('dark-mode');ctx.clearRect(0,0,W,H);
+    dots.forEach(function(d){d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1});
+    ctx.lineWidth=1;for(var i=0;i<dots.length;i++){var a=dots[i];ctx.fillStyle=dark?'rgba(212,240,56,.35)':'rgba(11,107,87,.28)';ctx.beginPath();ctx.arc(a.x,a.y,1.8,0,6.283);ctx.fill();
+      for(var j=i+1;j<dots.length;j++){var b=dots[j],dx=a.x-b.x,dy=a.y-b.y,q=dx*dx+dy*dy;if(q<9000){ctx.strokeStyle=(dark?'rgba(212,240,56,':'rgba(11,107,87,')+(.16*(1-q/9000)).toFixed(3)+')';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}}}
+    items.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;if(p.y<-40){p.y=H+40;p.x=Math.random()*W}if(p.x<-60)p.x=W+60;if(p.x>W+60)p.x=-60;cap(p.x,p.y,p.r,p.s,p.c,dark)})}
+  size();seed();addEventListener('resize',function(){size()});if(!reduce)requestAnimationFrame(loop);
+  /* hover sweep + tilt on KPI cards */
+  var tiles='#sec-dashboard .rkp-kpi,#sec-dashboard .rkp-tile';
+  document.addEventListener('pointerenter',function(e){var t=e.target.closest&&e.target.closest(tiles);if(!t||reduce||B.classList.contains('rkp-noanim')||t.classList.contains('rkp-sweep'))return;t.classList.add('rkp-sweep');setTimeout(function(){t.classList.remove('rkp-sweep')},1000)},true);
+  document.addEventListener('pointermove',function(e){if(e.pointerType==='touch'||reduce)return;var k=e.target.closest&&e.target.closest('#sec-dashboard .rkp-kpi');if(!k)return;var r=k.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;k.style.setProperty('--tx',(-y*7).toFixed(2)+'deg');k.style.setProperty('--ty',(x*9).toFixed(2)+'deg')});
+  document.addEventListener('pointerout',function(e){var k=e.target.closest&&e.target.closest('#sec-dashboard .rkp-kpi');if(k&&!k.contains(e.relatedTarget)){k.style.setProperty('--tx','0deg');k.style.setProperty('--ty','0deg')}});
+  /* sparkle burst: filter clicks and new dispense events */
+  function burst(x,y){if(reduce||B.classList.contains('rkp-noanim'))return;var cols=['#D4F038','#14B8A6','#0B6B57','#FFFFFF'];
+    for(var i=0;i<14;i++){var p=document.createElement('i'),a=Math.random()*6.283,d=30+Math.random()*50;p.className='rk-p';p.style.cssText='left:'+x+'px;top:'+y+'px;background:'+cols[i%4]+';--dx:'+(Math.cos(a)*d).toFixed(0)+'px;--dy:'+(Math.sin(a)*d).toFixed(0)+'px;width:'+(5+Math.random()*5)+'px;height:'+(5+Math.random()*5)+'px';document.body.appendChild(p);setTimeout(function(q){q.remove()},900,p)}}
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#sec-dashboard .rkp-seg button,#sec-dashboard .rkp-lg button,#sec-dashboard .rkp-chips button,#sec-dashboard .rkp-hb,#sec-dashboard .rkp-col'))burst(e.clientX,e.clientY)},true);
+  var hl=(window.hist||[]).length;setInterval(function(){var n=(window.hist||[]).length;if(n>hl){var k=document.querySelector('#sec-dashboard .rkp-kpi');if(k){var r=k.getBoundingClientRect();burst(r.left+r.width/2,r.top+30);k.classList.add('rkp-sweep');setTimeout(function(){k.classList.remove('rkp-sweep')},1000)}}hl=n},1200);
+  /* keep the Google account strip at the bottom of the dashboard */
+  var dash=document.getElementById('sec-dashboard');
+  function moveStrip(){var s=document.getElementById('rkp-strip');if(s&&dash&&s.parentNode===dash&&dash.lastElementChild!==s){dash.appendChild(s);s.classList.add('rk-bottom')}else if(s&&dash&&s.parentNode!==dash&&dash.contains(s)){var top=s;while(top.parentNode!==dash)top=top.parentNode;if(dash.lastElementChild!==top)dash.appendChild(top);s.classList.add('rk-bottom')}}
+  if(dash){new MutationObserver(moveStrip).observe(dash,{childList:true});moveStrip();setInterval(moveStrip,1500)}
+})();
+</script>
+<style id="rk-fix-dispense">
+/* Dispense page: student search (only this box) */
+#sec-dispense #ds.search-input{padding:12px 46px 12px 46px!important;font-size:15px!important;font-weight:600;line-height:1.3;height:auto;letter-spacing:0;color:var(--text)!important;-webkit-text-fill-color:var(--text);caret-color:var(--primary)}
+#sec-dispense #ds.search-input::placeholder{font-weight:500;color:var(--text3);-webkit-text-fill-color:var(--text3)}
+#sec-dispense .search-wrap{position:relative}
+#sec-dispense .search-wrap .search-icon{left:14px;z-index:2;pointer-events:none}
+#sec-dispense .ac-wrap{position:relative;z-index:30}
+/* the result list was cut off by the card, let it float above the page */
+#sec-dispense .mcard,#sec-dispense .mcard-body{overflow:visible!important}
+#sec-dispense .ac-dropdown{z-index:500!important;max-height:min(340px,55vh);overflow:auto;border-radius:14px;box-shadow:0 18px 44px rgba(1,43,36,.22);margin-top:6px;background:var(--surface)!important;border:1px solid var(--border)}
+#sec-dispense .ac-dropdown>*{font-size:13.5px;color:var(--text)}
+</style>
+<style id="rk-fix-search">
+/* every search box: the magnifier no longer sits on top of the typed text */
+.search-wrap{position:relative}
+.search-wrap .search-icon{left:14px!important;z-index:2;pointer-events:none}
+body .search-wrap .search-input{padding-left:46px!important;padding-right:14px;font-size:14.5px!important;font-weight:600;line-height:1.3;letter-spacing:0;color:var(--text)!important;-webkit-text-fill-color:var(--text);caret-color:var(--primary)}
+body .search-wrap .search-input::placeholder{font-weight:500;color:var(--text3);-webkit-text-fill-color:var(--text3)}
+body #sec-dispense .search-wrap .search-input{padding-right:46px}
+</style>
+<script>
+(function(){function fix(){[].forEach.call(document.querySelectorAll('.search-input,input[type=search]'),function(i){i.setAttribute('spellcheck','false');i.setAttribute('autocapitalize','off')})}
+fix();addEventListener('load',fix);setTimeout(fix,1500)})();
+</script>
+
+<script id="rk-ui-v9-js">
+(function(){
+  function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  /* ---------- theme override guard ---------- */
+  function idx(){try{var v=localStorage.getItem('rk_pal');return v!==null?+v:(localStorage.getItem('rk_user_accent')===null?0:null)}catch(e){return 0}}
+  new MutationObserver(function(){var i=idx();if(i===null||!window.__rkP||!window.rkApplyPalette)return;
+    var c=document.documentElement.style.getPropertyValue('--primary').trim().toLowerCase();if(c&&c!==window.__rkP.toLowerCase())window.rkApplyPalette(i)}).observe(document.documentElement,{attributes:true,attributeFilter:['style']});
+  document.addEventListener('input',function(e){if(e.target&&e.target.id==='customThemePicker')try{localStorage.removeItem('rk_pal');localStorage.setItem('rk_user_accent','1')}catch(_){}});
+
+  /* ---------- PRINT: proper report sheet ---------- */
+  var _print=window.print.bind(window);
+  function cells(t){
+    var th=[].slice.call(t.querySelectorAll('thead th')).map(function(x){return x.textContent.replace(/\s+/g,' ').trim()});
+    var skip=th.map(function(h){return !h||/^(del|delete|action|actions|edit|view|print|select)$/i.test(h)});
+    var rows=[].slice.call(t.querySelectorAll('tbody tr')).filter(function(r){return r.offsetParent!==null&&r.cells.length>=th.length-skip.filter(Boolean).length&&r.cells.length>1}).map(function(r){
+      return [].slice.call(r.cells).map(function(c){return c.textContent.replace(/\s+/g,' ').trim()});});
+    return {th:th,skip:skip,rows:rows};
+  }
+  function tableHTML(t){
+    var d=cells(t);if(!d.rows.length)return '<div class="rkpr-empty">No records to print</div>';
+    var keep=d.th.map(function(h,i){return !d.skip[i]}),qi=d.th.findIndex(function(h){return /^(qty|quantity)$/i.test(h)}),sum=0;
+    var head='<thead><tr>'+d.th.map(function(h,i){return keep[i]?'<th>'+esc(h)+'</th>':''}).join('')+'</tr></thead>';
+    var body='<tbody>'+d.rows.map(function(r){if(qi>-1)sum+=parseFloat(r[qi])||0;return '<tr>'+r.map(function(c,i){return keep[i]?'<td>'+esc(c)+'</td>':''}).join('')+'</tr>'}).join('')+'</tbody>';
+    var n=keep.filter(Boolean).length,foot='<tfoot><tr><td colspan="'+n+'">Total records: '+d.rows.length+(qi>-1?' &nbsp;\u00b7&nbsp; Total quantity: '+sum:'')+'</td></tr></tfoot>';
+    return '<table class="rkpr-tbl">'+head+body+foot+'</table>';
+  }
+  function build(){
+    var sec=document.querySelector('.page-section.active')||document.body,h1=sec.querySelector('.page-header h1'),p=sec.querySelector('.page-header p');
+    var title=(h1?h1.textContent:'Report').replace(/^[^A-Za-z0-9]+/,'').trim(),sub=p?p.textContent.trim():'';
+    var logo=(document.querySelector('.login-logo-wrap img,#rk-splash-logo,.sidebar-logo img,.splash-logo img')||{}).src||'';
+    var who=(document.querySelector('#rk-user .rk-ct b')||{}).textContent||'',role=(document.querySelector('#rk-user .rk-ct small')||document.getElementById('role-badge')||{}).textContent||'';who=who||role;
+    var now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+    var kpis=[].slice.call(sec.querySelectorAll('.stat-card')).map(function(c){var l=c.querySelector('.stat-label'),v=c.querySelector('.stat-value');return l&&v?'<div class="rkpr-kpi"><small>'+esc(l.textContent.trim())+'</small><b>'+esc(v.textContent.trim())+'</b></div>':''}).join('');
+    var parts='';
+    [].slice.call(sec.querySelectorAll('table.mtable')).forEach(function(t){var h=t.closest('.mcard'),ti=h&&h.querySelector('.mcard-title');
+      parts+=(ti?'<div class="rkpr-h2">'+esc(ti.textContent.replace(/^[^A-Za-z0-9]+/,'').replace(/^(summarize|list_alt|history|inventory_2)\s*/i,'').trim())+'</div>':'')+tableHTML(t)});
+    var bub=[].slice.call(sec.querySelectorAll('.actlog-bubble'));
+    if(bub.length){parts+='<div class="rkpr-h2">Activity</div><table class="rkpr-tbl"><thead><tr><th>Who</th><th>Activity</th><th>Time</th></tr></thead><tbody>'+bub.map(function(b){
+      var w=(b.querySelector('.rk-lg-who')||{}).textContent||'',tm=(b.querySelector('.actlog-time')||{}).textContent||'',m=b.innerText.replace(w,'').replace(tm,'').replace(/\s+/g,' ').trim();
+      return '<tr><td>'+esc(w)+'</td><td>'+esc(m)+'</td><td>'+esc(tm)+'</td></tr>'}).join('')+'</tbody></table>'}
+    if(!parts)parts='<div class="rkpr-empty">Nothing to print on this page.</div>';
+    var d=document.getElementById('rk-print');if(!d){d=document.createElement('div');d.id='rk-print';document.body.appendChild(d)}
+    d.innerHTML='<div class="rkpr-bar"></div><div class="rkpr-head">'+(logo?'<img class="rkpr-logo" src="'+esc(logo)+'" alt="">':'')+
+      '<div class="rkpr-org"><b>Ramakrishna Mission Health Center</b><span>RKMS MediStock Pro \u00b7 Medicine stock &amp; dispensing</span></div>'+
+      '<div class="rkpr-tag"><em>REPORT</em><h1>'+esc(title)+'</h1></div></div>'+
+      '<div class="rkpr-meta"><div><small>Printed on</small><b>'+esc(now)+'</b></div><div><small>Printed by</small><b>'+esc(who||'-')+'</b></div><div><small>Role</small><b>'+esc(role.split('\u00b7')[0]||'-')+'</b></div>'+(sub?'<div><small>Scope</small><b>'+esc(sub)+'</b></div>':'')+'</div>'+
+      (kpis?'<div class="rkpr-kpis">'+kpis+'</div>':'')+parts+
+      '<div class="rkpr-sign"><div>Prepared by</div><div>Verified by</div><div>Medical Officer</div></div><div class="rkpr-foot">RKMS MediStock Pro \u00b7 System-generated report \u00b7 '+esc(now)+'</div>';
+  }
+  window.rkBuildPrint=build;
+  window.print=function(){try{build()}catch(e){console.error(e)}_print()};
+  addEventListener('beforeprint',function(){if(window.__rkNoBP)return;try{build()}catch(e){}});
+
+  /* ---------- CHATBOT: Shadow Hunter avatar + animations ---------- */
+  var SVG='<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="rkg" cx="50%" cy="30%" r="80%"><stop offset="0" stop-color="#5B21B6"/><stop offset="1" stop-color="#090514"/></radialGradient></defs>'+
+    '<circle cx="32" cy="32" r="32" fill="url(#rkg)"/><path d="M32 7C20 7 12 16 12 28c0 6 2 11 5 15l-5 16h40l-5-16c3-4 5-9 5-15C52 16 44 7 32 7z" fill="#07050F"/>'+
+    '<path d="M32 13c-9 0-15 7-15 15 0 6 3 10 7 12h16c4-2 7-6 7-12 0-8-6-15-15-15z" fill="#140D26"/>'+
+    '<path class="rk-eye" d="M21 28.5l8.5 3-8.5 1.2z"/><path class="rk-eye" d="M43 28.5l-8.5 3 8.5 1.2z"/>'+
+    '<path d="M24 46c4 2 12 2 16 0" stroke="#3B2A66" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>';
+  function av(){var u='';try{u=localStorage.getItem('rk_bot_av')||''}catch(e){}return '<span class="rkc-av">'+(u?'<img src="'+u+'" alt="">':SVG)+'</span>'}
+  function dress(fab){
+    if(fab.dataset.rk)return;fab.dataset.rk=1;fab.innerHTML=av();fab.setAttribute('aria-label','Open assistant');
+  }
+  function typeOut(el){var t=el.textContent;if(t.length<2||t.length>600){return}el.textContent='';var i=0,st=Math.max(6,Math.min(18,900/t.length));
+    (function n(){if(!el.isConnected)return;i+=2;el.textContent=t.slice(0,i);var b=el.parentNode;if(b)b.scrollTop=1e9;if(i<t.length)setTimeout(n,st);else el.textContent=t})()}
+  function dressPanel(p){
+    if(p.dataset.rk)return;p.dataset.rk=1;
+    var head=p.querySelector('.chat-head'),old=head&&head.firstElementChild,x=head&&head.querySelector('.cclose');
+    if(head&&old){var t=document.createElement('div');t.className='rkc-t';t.innerHTML='<b>Shadow Assistant</b><small>Online \u00b7 reads your live dashboard data</small>';
+      var a=document.createElement('span');a.innerHTML=av();a=a.firstChild;head.insertBefore(a,head.firstChild);old.replaceWith(t);
+      var up=document.createElement('label');up.className='rkc-up';up.title='Set your own avatar image';up.innerHTML='\uD83D\uDDBC<input type="file" accept="image/*" hidden>';head.insertBefore(up,x);
+      up.querySelector('input').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d'),m=Math.min(im.width,im.height);g.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,128,128);
+        try{localStorage.setItem('rk_bot_av',c.toDataURL('image/jpeg',.85))}catch(_){}document.querySelectorAll('.rkc-av').forEach(function(n){n.outerHTML=av()})};im.src=r.result};r.readAsDataURL(f)}}
+    var em=document.createElement('div');em.className='rkc-embers';for(var i=0;i<10;i++){var e=document.createElement('i');e.style.left=(i*10+Math.random()*6)+'%';e.style.animationDelay=(Math.random()*5)+'s';e.style.animationDuration=(4+Math.random()*3)+'s';em.appendChild(e)}p.insertBefore(em,p.firstChild);
+    if(x){x.textContent='\u2715';x.style.fontFamily='Arial,sans-serif'}var sb=p.querySelector('#rkcs');if(sb){sb.textContent='\u27A4';sb.style.fontFamily='Arial,sans-serif'}
+    var body=p.querySelector('.chat-body'),typing=null;
+    new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){
+      if(n.nodeType!==1||!n.classList.contains('chat-msg')||n.classList.contains('rkc-typing'))return;
+      if(n.classList.contains('user')){if(!typing){typing=document.createElement('div');typing.className='rkc-typing';typing.innerHTML='<i></i><i></i><i></i>';body.appendChild(typing);body.scrollTop=1e9}}
+      else if(n.classList.contains('bot')){if(typing){typing.remove();typing=null}typeOut(n)}})})}).observe(body,{childList:true});
+    new MutationObserver(function(){if(p.classList.contains('show')){var r=document.createElement('div');r.className='rkc-rune';
+      r.innerHTML='<svg viewBox="0 0 100 100" fill="none" stroke="#A855F7" stroke-width="1.4"><circle cx="50" cy="50" r="46" stroke-dasharray="4 3"/><circle cx="50" cy="50" r="34"/><polygon points="50,18 78,66 22,66"/><polygon points="50,82 22,34 78,34"/><circle cx="50" cy="50" r="7" fill="#C084FC"/></svg>';
+      p.appendChild(r);setTimeout(function(){r.remove()},1800);
+      var f=document.querySelector('.chat-fab');if(f){var b=f.getBoundingClientRect(),right=b.left>innerWidth/2;p.style.left=right?'auto':'26px';p.style.right=right?(innerWidth-b.right)+'px':'auto';p.style.transformOrigin=right?'bottom right':'bottom left';p.style.bottom=(innerHeight-b.top+12)+'px'}}}).observe(p,{attributes:true,attributeFilter:['class']});
+  }
+  function scan(){document.querySelectorAll('.chat-fab').forEach(dress);var p=document.getElementById('rkChat');if(p)dressPanel(p)}
+  new MutationObserver(scan).observe(document.body,{childList:true});scan();
+})();
 </script>
 </body>
 </html>
