@@ -1177,6 +1177,87 @@ body:not(.dark-mode) .sidebar .nav-item.active .material-icons-round{color:var(-
 .role-tab{color:rgba(255,255,255,.9)!important}
 .login-screen::after{opacity:.45}
 </style>
+
+<style id="rk-ui-v9">
+/* ================= PRINT SHEET (report layout) ================= */
+#rk-print{display:none}
+@media print{
+  @page{size:A4;margin:13mm 12mm 17mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font:9px Arial;color:#6b7280}@bottom-left{content:"RKMS MediStock Pro \00B7  System-generated report";font:9px Arial;color:#6b7280}}
+  body>*:not(#rk-print){display:none!important}
+  html,html body,html body[class][class][class]{background:#fff!important;background-image:none!important}body::before,body::after{display:none!important}
+  #rk-print{display:block!important;background:#fff;color:#111827;font:12px/1.5 'Plus Jakarta Sans',Inter,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rkpr-bar{height:5px;border-radius:99px;background:linear-gradient(90deg,#4338CA,#F43F73,#14B8A6);margin-bottom:12px}
+  .rkpr-head{display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:1px solid #E3E5F5}
+  .rkpr-logo{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #E3E5F5}
+  .rkpr-org{flex:1}.rkpr-org b{display:block;font:800 18px 'Space Grotesk','Plus Jakarta Sans',Arial,sans-serif;letter-spacing:-.3px;color:#1E1B4B}
+  .rkpr-org span{color:#6b7280;font-size:11.5px}
+  .rkpr-tag{text-align:right}.rkpr-tag em{display:inline-block;font-style:normal;font-weight:800;font-size:10px;letter-spacing:1.5px;color:#fff;background:#4338CA;padding:4px 10px;border-radius:99px}
+  .rkpr-tag h1{margin:6px 0 0;font:800 20px 'Space Grotesk','Plus Jakarta Sans',Arial,sans-serif;color:#1E1B4B}
+  .rkpr-meta{display:flex;gap:10px;margin:12px 0 14px}
+  .rkpr-meta div{flex:1;background:#F5F6FF;border:1px solid #E3E5F5;border-radius:10px;padding:7px 10px}
+  .rkpr-meta small{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:#6b7280}.rkpr-meta b{font-size:12px}
+  .rkpr-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px}
+  .rkpr-kpi{border:1px solid #E3E5F5;border-left:4px solid #4338CA;border-radius:10px;padding:8px 10px;break-inside:avoid}
+  .rkpr-kpi small{display:block;color:#6b7280;font-size:10px}.rkpr-kpi b{font:800 18px 'Space Grotesk',Arial,sans-serif;color:#1E1B4B}
+  .rkpr-h2{font:800 13px 'Space Grotesk','Plus Jakarta Sans',Arial,sans-serif;color:#1E1B4B;margin:14px 0 6px;padding-left:8px;border-left:4px solid #F43F73}
+  .rkpr-tbl{width:100%;border-collapse:collapse;font-size:11px}
+  .rkpr-tbl thead{display:table-header-group}
+  .rkpr-tbl th{background:#4338CA!important;color:#fff!important;text-align:left;padding:7px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.6px}
+  .rkpr-tbl td{padding:6px 8px;border-bottom:1px solid #E3E5F5;vertical-align:top}
+  .rkpr-tbl tr{break-inside:avoid}.rkpr-tbl tbody tr:nth-child(even) td{background:#F7F8FF!important}
+  .rkpr-tbl tfoot td{font-weight:800;border-top:2px solid #4338CA;background:#EEF0FF!important}
+  .rkpr-empty{padding:18px;text-align:center;color:#6b7280;border:1px dashed #C7C9FF;border-radius:10px}
+  .rkpr-sign{display:flex;gap:28px;margin-top:38px;break-inside:avoid}
+  .rkpr-sign div{flex:1;border-top:1px solid #111827;padding-top:5px;text-align:center;font-size:10.5px;color:#374151}
+  .rkpr-foot{display:none}
+}
+
+/* ================= CHATBOT: Shadow Hunter assistant (original character) ================= */
+.chat-fab{width:62px!important;height:62px!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important;animation:rkc9Bob 3.2s ease-in-out infinite}
+@keyframes rkc9Bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.rkc-av{position:relative;width:100%;height:100%;border-radius:50%;display:block}
+.rkc-av>svg,.rkc-av>img{width:100%;height:100%;border-radius:50%;display:block;object-fit:cover;position:relative;z-index:2;border:2px solid #A855F7;box-shadow:0 0 18px rgba(168,85,247,.75)}
+.rkc-av::before,.rkc-av::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(168,85,247,.55);animation:rkc9Aura 2.2s ease-out infinite;z-index:1}
+.rkc-av::after{animation-delay:1.1s}
+@keyframes rkc9Aura{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.55);opacity:0}}
+.rk-eye{fill:#D8B4FE;filter:drop-shadow(0 0 3px #C084FC);animation:rkc9Blink 4.5s infinite;transform-origin:center;transform-box:fill-box}
+@keyframes rkc9Blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.chat-fab:hover .rkc-av>svg{box-shadow:0 0 30px rgba(216,180,254,.95)}
+.chat-fab:hover .rk-eye{fill:#fff}
+#rkChat{width:min(380px,calc(100vw - 24px))!important;max-height:min(600px,calc(100vh - 120px))!important;border:0!important;border-radius:22px!important;background:#0D0818!important;color:#EDE9FE;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(168,85,247,.5),0 24px 70px rgba(76,29,149,.55),0 0 60px rgba(168,85,247,.25)!important;transform-origin:bottom left}
+#rkChat.show{animation:rkc9Summon .65s cubic-bezier(.2,1.3,.4,1) both!important}
+@keyframes rkc9Summon{0%{opacity:0;transform:scale(.55) translateY(30px);filter:blur(10px) brightness(2)}60%{filter:blur(0) brightness(1.4)}100%{opacity:1;transform:none;filter:none}}
+#rkChat .chat-head{background:linear-gradient(135deg,#2E1065,#4C1D95 55%,#0D0818)!important;padding:12px 14px!important;gap:10px!important;position:relative;overflow:hidden}
+#rkChat .chat-head .rkc-av{width:46px;height:46px;flex:none}
+.rkc-t b{display:block;font:700 14px 'Space Grotesk','Plus Jakarta Sans',sans-serif;letter-spacing:.2px;color:#fff}
+.rkc-t small{font-size:10.5px;color:#C4B5FD}.rkc-t small::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ADE80;margin-right:5px;box-shadow:0 0 8px #4ADE80;animation:rkc9PulseDot 1.6s infinite}
+@keyframes rkc9PulseDot{50%{opacity:.35}}
+#rkChat .chat-head>.rkc-t{flex:1}
+.rkc-up{cursor:pointer;opacity:.8;font-size:15px;line-height:1}.rkc-up:hover{opacity:1}
+#rkChat .chat-body{background:radial-gradient(500px 300px at 50% 0,rgba(124,58,237,.22),transparent 70%),#0D0818!important;max-height:none!important;min-height:200px;scroll-behavior:smooth;position:relative}
+#rkChat .chat-body::-webkit-scrollbar{width:6px}#rkChat .chat-body::-webkit-scrollbar-thumb{background:#6D28D9;border-radius:6px}
+#rkChat .chat-msg{animation:rkc9Msg .35s cubic-bezier(.2,1.3,.4,1) both;font-size:12.6px!important}
+@keyframes rkc9Msg{from{opacity:0;transform:translateY(10px) scale(.96)}}
+#rkChat .chat-msg.bot{background:rgba(124,58,237,.16)!important;border:1px solid rgba(168,85,247,.45)!important;color:#EDE9FE!important;box-shadow:0 0 14px rgba(124,58,237,.18)}
+#rkChat .chat-msg.user{background:linear-gradient(135deg,#7C3AED,#C026D3)!important;color:#fff!important;box-shadow:0 6px 18px rgba(147,51,234,.4)}
+.rkc-typing{align-self:flex-start;display:flex;gap:5px;padding:10px 14px;border-radius:14px;background:rgba(124,58,237,.16);border:1px solid rgba(168,85,247,.45)}
+.rkc-typing i{width:7px;height:7px;border-radius:50%;background:#C084FC;animation:rkc9Dot 1s infinite}.rkc-typing i:nth-child(2){animation-delay:.15s}.rkc-typing i:nth-child(3){animation-delay:.3s}
+@keyframes rkc9Dot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+#rkChat .chat-quick{background:#0D0818;padding:8px 12px 10px!important}
+#rkChat .chat-quick span{background:rgba(124,58,237,.18)!important;color:#DDD6FE!important;border:1px solid rgba(168,85,247,.5);transition:transform .2s,box-shadow .2s}
+#rkChat .chat-quick span:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 0 14px rgba(168,85,247,.7)}
+#rkChat .chat-input-wrap{background:#140B26;border-top:1px solid rgba(168,85,247,.35)!important}
+#rkChat .chat-input-wrap input{color:#fff!important}#rkChat .chat-input-wrap input::placeholder{color:#A78BFA}
+#rkChat .chat-input-wrap button{color:#fff!important;background:linear-gradient(135deg,#7C3AED,#C026D3)!important;border-radius:12px;padding:6px 10px!important}
+.rkc-embers{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.rkc-embers i{position:absolute;bottom:-8px;width:4px;height:4px;border-radius:50%;background:#C084FC;box-shadow:0 0 8px #A855F7;opacity:0;animation:rkc9Ember 5s linear infinite}
+@keyframes rkc9Ember{0%{transform:translateY(0) scale(1);opacity:0}15%{opacity:.9}100%{transform:translateY(-110px) translateX(14px) scale(.3);opacity:0}}
+.rkc-rune{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0D0818;z-index:5;animation:rkc9RuneOut 1s ease-in .7s forwards;pointer-events:none}
+.rkc-rune svg{width:170px;height:170px;animation:rkc9Spin 2.2s linear infinite;filter:drop-shadow(0 0 10px #A855F7)}
+@keyframes rkc9Spin{to{transform:rotate(360deg)}}@keyframes rkc9RuneOut{to{opacity:0;visibility:hidden}}
+@media(prefers-reduced-motion:reduce){.chat-fab,.rkc-av::before,.rkc-av::after,.rk-eye,.rkc-embers i,.rkc-rune svg{animation:none!important}}
+</style>
 </head>
 <body>
 
@@ -6258,11 +6339,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function mix(a,b,t){var x=rgb(a),y=rgb(b);return '#'+x.map(function(v,i){return ('0'+Math.round(v*(1-t)+y[i]*t).toString(16)).slice(-2)}).join('')}
   function apply(i,sv){
     var P=PAL[i]||PAL[0],r=document.documentElement.style;
-    r.setProperty('--primary',P.p);r.setProperty('--primary-dark',mix(P.p,'#000000',.3));r.setProperty('--primary-light',mix(P.p,'#ffffff',.9));r.setProperty('--primary-mid',mix(P.p,'#ffffff',.6));
+    r.setProperty('--primary',P.p);window.__rkP=P.p;r.setProperty('--primary-dark',mix(P.p,'#000000',.3));r.setProperty('--primary-light',mix(P.p,'#ffffff',.9));r.setProperty('--primary-mid',mix(P.p,'#ffffff',.6));
     r.setProperty('--pg-dark',P.p);r.setProperty('--rk-a',P.p);r.setProperty('--rk-b',P.s);r.setProperty('--rk-c',P.a);
     r.setProperty('--rk-bg',P.bg);r.setProperty('--rk-text',P.tx);r.setProperty('--rk-bg1',P.b1);r.setProperty('--rk-bg2',P.b2);r.setProperty('--rk-bg3',P.b3);
     var m=document.querySelector('meta[name=theme-color]');if(m)m.content=P.p;
-    if(sv&&hasLS)try{localStorage.setItem('rk_pal',i);localStorage.removeItem('ms_theme_idx');localStorage.removeItem('ms_theme_custom')}catch(e){}
+    if(sv&&hasLS)try{localStorage.setItem('rk_pal',i);localStorage.removeItem('rk_user_accent');localStorage.removeItem('ms_theme_idx');localStorage.removeItem('ms_theme_custom')}catch(e){}
     paint(i);
   }
   function paint(i){
@@ -6369,12 +6450,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rk-ui-v8-js">
 (function(){
   function boot(){
-    var i=null;try{var v=localStorage.getItem('rk_pal');if(v!==null)i=+v;else if(localStorage.getItem('ms_theme_idx')===null)i=0}catch(e){}
+    var i=null;try{var v=localStorage.getItem('rk_pal');if(v!==null)i=+v;else if(localStorage.getItem('rk_user_accent')===null)i=0}catch(e){}
     if(i!==null&&window.rkApplyPalette)window.rkApplyPalette(i);
   }
   if(document.readyState==='complete')boot();else addEventListener('load',function(){boot();setTimeout(boot,60)});
   /* picking a colour in Settings > Accent Theme means the user wants that one: forget the studio choice */
-  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.tswatch,#themeSwatchWrap'))try{localStorage.removeItem('rk_pal')}catch(_){}});
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.tswatch,#themeSwatchWrap'))try{localStorage.removeItem('rk_pal');localStorage.setItem('rk_user_accent','1')}catch(_){}});
 })();
 </script>
 <style id="rk-opening-v3">
@@ -8106,6 +8187,96 @@ body #sec-dispense .search-wrap .search-input{padding-right:46px}
 <script>
 (function(){function fix(){[].forEach.call(document.querySelectorAll('.search-input,input[type=search]'),function(i){i.setAttribute('spellcheck','false');i.setAttribute('autocapitalize','off')})}
 fix();addEventListener('load',fix);setTimeout(fix,1500)})();
+</script>
+
+<script id="rk-ui-v9-js">
+(function(){
+  function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  /* ---------- theme override guard ---------- */
+  function idx(){try{var v=localStorage.getItem('rk_pal');return v!==null?+v:(localStorage.getItem('rk_user_accent')===null?0:null)}catch(e){return 0}}
+  new MutationObserver(function(){var i=idx();if(i===null||!window.__rkP||!window.rkApplyPalette)return;
+    var c=document.documentElement.style.getPropertyValue('--primary').trim().toLowerCase();if(c&&c!==window.__rkP.toLowerCase())window.rkApplyPalette(i)}).observe(document.documentElement,{attributes:true,attributeFilter:['style']});
+  document.addEventListener('input',function(e){if(e.target&&e.target.id==='customThemePicker')try{localStorage.removeItem('rk_pal');localStorage.setItem('rk_user_accent','1')}catch(_){}});
+
+  /* ---------- PRINT: proper report sheet ---------- */
+  var _print=window.print.bind(window);
+  function cells(t){
+    var th=[].slice.call(t.querySelectorAll('thead th')).map(function(x){return x.textContent.replace(/\s+/g,' ').trim()});
+    var skip=th.map(function(h){return !h||/^(del|delete|action|actions|edit|view|print|select)$/i.test(h)});
+    var rows=[].slice.call(t.querySelectorAll('tbody tr')).filter(function(r){return r.offsetParent!==null&&r.cells.length>=th.length-skip.filter(Boolean).length&&r.cells.length>1}).map(function(r){
+      return [].slice.call(r.cells).map(function(c){return c.textContent.replace(/\s+/g,' ').trim()});});
+    return {th:th,skip:skip,rows:rows};
+  }
+  function tableHTML(t){
+    var d=cells(t);if(!d.rows.length)return '<div class="rkpr-empty">No records to print</div>';
+    var keep=d.th.map(function(h,i){return !d.skip[i]}),qi=d.th.findIndex(function(h){return /^(qty|quantity)$/i.test(h)}),sum=0;
+    var head='<thead><tr>'+d.th.map(function(h,i){return keep[i]?'<th>'+esc(h)+'</th>':''}).join('')+'</tr></thead>';
+    var body='<tbody>'+d.rows.map(function(r){if(qi>-1)sum+=parseFloat(r[qi])||0;return '<tr>'+r.map(function(c,i){return keep[i]?'<td>'+esc(c)+'</td>':''}).join('')+'</tr>'}).join('')+'</tbody>';
+    var n=keep.filter(Boolean).length,foot='<tfoot><tr><td colspan="'+n+'">Total records: '+d.rows.length+(qi>-1?' &nbsp;\u00b7&nbsp; Total quantity: '+sum:'')+'</td></tr></tfoot>';
+    return '<table class="rkpr-tbl">'+head+body+foot+'</table>';
+  }
+  function build(){
+    var sec=document.querySelector('.page-section.active')||document.body,h1=sec.querySelector('.page-header h1'),p=sec.querySelector('.page-header p');
+    var title=(h1?h1.textContent:'Report').replace(/^[^A-Za-z0-9]+/,'').trim(),sub=p?p.textContent.trim():'';
+    var logo=(document.querySelector('.login-logo-wrap img,#rk-splash-logo,.sidebar-logo img,.splash-logo img')||{}).src||'';
+    var who=(document.querySelector('#rk-user .rk-ct b')||{}).textContent||'',role=(document.querySelector('#rk-user .rk-ct small')||document.getElementById('role-badge')||{}).textContent||'';who=who||role;
+    var now=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+    var kpis=[].slice.call(sec.querySelectorAll('.stat-card')).map(function(c){var l=c.querySelector('.stat-label'),v=c.querySelector('.stat-value');return l&&v?'<div class="rkpr-kpi"><small>'+esc(l.textContent.trim())+'</small><b>'+esc(v.textContent.trim())+'</b></div>':''}).join('');
+    var parts='';
+    [].slice.call(sec.querySelectorAll('table.mtable')).forEach(function(t){var h=t.closest('.mcard'),ti=h&&h.querySelector('.mcard-title');
+      parts+=(ti?'<div class="rkpr-h2">'+esc(ti.textContent.replace(/^[^A-Za-z0-9]+/,'').replace(/^(summarize|list_alt|history|inventory_2)\s*/i,'').trim())+'</div>':'')+tableHTML(t)});
+    var bub=[].slice.call(sec.querySelectorAll('.actlog-bubble'));
+    if(bub.length){parts+='<div class="rkpr-h2">Activity</div><table class="rkpr-tbl"><thead><tr><th>Who</th><th>Activity</th><th>Time</th></tr></thead><tbody>'+bub.map(function(b){
+      var w=(b.querySelector('.rk-lg-who')||{}).textContent||'',tm=(b.querySelector('.actlog-time')||{}).textContent||'',m=b.innerText.replace(w,'').replace(tm,'').replace(/\s+/g,' ').trim();
+      return '<tr><td>'+esc(w)+'</td><td>'+esc(m)+'</td><td>'+esc(tm)+'</td></tr>'}).join('')+'</tbody></table>'}
+    if(!parts)parts='<div class="rkpr-empty">Nothing to print on this page.</div>';
+    var d=document.getElementById('rk-print');if(!d){d=document.createElement('div');d.id='rk-print';document.body.appendChild(d)}
+    d.innerHTML='<div class="rkpr-bar"></div><div class="rkpr-head">'+(logo?'<img class="rkpr-logo" src="'+esc(logo)+'" alt="">':'')+
+      '<div class="rkpr-org"><b>Ramakrishna Mission Health Center</b><span>RKMS MediStock Pro \u00b7 Medicine stock &amp; dispensing</span></div>'+
+      '<div class="rkpr-tag"><em>REPORT</em><h1>'+esc(title)+'</h1></div></div>'+
+      '<div class="rkpr-meta"><div><small>Printed on</small><b>'+esc(now)+'</b></div><div><small>Printed by</small><b>'+esc(who||'-')+'</b></div><div><small>Role</small><b>'+esc(role.split('\u00b7')[0]||'-')+'</b></div>'+(sub?'<div><small>Scope</small><b>'+esc(sub)+'</b></div>':'')+'</div>'+
+      (kpis?'<div class="rkpr-kpis">'+kpis+'</div>':'')+parts+
+      '<div class="rkpr-sign"><div>Prepared by</div><div>Verified by</div><div>Medical Officer</div></div><div class="rkpr-foot">RKMS MediStock Pro \u00b7 System-generated report \u00b7 '+esc(now)+'</div>';
+  }
+  window.rkBuildPrint=build;
+  window.print=function(){try{build()}catch(e){console.error(e)}_print()};
+  addEventListener('beforeprint',function(){if(window.__rkNoBP)return;try{build()}catch(e){}});
+
+  /* ---------- CHATBOT: Shadow Hunter avatar + animations ---------- */
+  var SVG='<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="rkg" cx="50%" cy="30%" r="80%"><stop offset="0" stop-color="#5B21B6"/><stop offset="1" stop-color="#090514"/></radialGradient></defs>'+
+    '<circle cx="32" cy="32" r="32" fill="url(#rkg)"/><path d="M32 7C20 7 12 16 12 28c0 6 2 11 5 15l-5 16h40l-5-16c3-4 5-9 5-15C52 16 44 7 32 7z" fill="#07050F"/>'+
+    '<path d="M32 13c-9 0-15 7-15 15 0 6 3 10 7 12h16c4-2 7-6 7-12 0-8-6-15-15-15z" fill="#140D26"/>'+
+    '<path class="rk-eye" d="M21 28.5l8.5 3-8.5 1.2z"/><path class="rk-eye" d="M43 28.5l-8.5 3 8.5 1.2z"/>'+
+    '<path d="M24 46c4 2 12 2 16 0" stroke="#3B2A66" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>';
+  function av(){var u='';try{u=localStorage.getItem('rk_bot_av')||''}catch(e){}return '<span class="rkc-av">'+(u?'<img src="'+u+'" alt="">':SVG)+'</span>'}
+  function dress(fab){
+    if(fab.dataset.rk)return;fab.dataset.rk=1;fab.innerHTML=av();fab.setAttribute('aria-label','Open assistant');
+  }
+  function typeOut(el){var t=el.textContent;if(t.length<2||t.length>600){return}el.textContent='';var i=0,st=Math.max(6,Math.min(18,900/t.length));
+    (function n(){if(!el.isConnected)return;i+=2;el.textContent=t.slice(0,i);var b=el.parentNode;if(b)b.scrollTop=1e9;if(i<t.length)setTimeout(n,st);else el.textContent=t})()}
+  function dressPanel(p){
+    if(p.dataset.rk)return;p.dataset.rk=1;
+    var head=p.querySelector('.chat-head'),old=head&&head.firstElementChild,x=head&&head.querySelector('.cclose');
+    if(head&&old){var t=document.createElement('div');t.className='rkc-t';t.innerHTML='<b>Shadow Assistant</b><small>Online \u00b7 reads your live dashboard data</small>';
+      var a=document.createElement('span');a.innerHTML=av();a=a.firstChild;head.insertBefore(a,head.firstChild);old.replaceWith(t);
+      var up=document.createElement('label');up.className='rkc-up';up.title='Set your own avatar image';up.innerHTML='\uD83D\uDDBC<input type="file" accept="image/*" hidden>';head.insertBefore(up,x);
+      up.querySelector('input').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d'),m=Math.min(im.width,im.height);g.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,128,128);
+        try{localStorage.setItem('rk_bot_av',c.toDataURL('image/jpeg',.85))}catch(_){}document.querySelectorAll('.rkc-av').forEach(function(n){n.outerHTML=av()})};im.src=r.result};r.readAsDataURL(f)}}
+    var em=document.createElement('div');em.className='rkc-embers';for(var i=0;i<10;i++){var e=document.createElement('i');e.style.left=(i*10+Math.random()*6)+'%';e.style.animationDelay=(Math.random()*5)+'s';e.style.animationDuration=(4+Math.random()*3)+'s';em.appendChild(e)}p.insertBefore(em,p.firstChild);
+    if(x){x.textContent='\u2715';x.style.fontFamily='Arial,sans-serif'}var sb=p.querySelector('#rkcs');if(sb){sb.textContent='\u27A4';sb.style.fontFamily='Arial,sans-serif'}
+    var body=p.querySelector('.chat-body'),typing=null;
+    new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){
+      if(n.nodeType!==1||!n.classList.contains('chat-msg')||n.classList.contains('rkc-typing'))return;
+      if(n.classList.contains('user')){if(!typing){typing=document.createElement('div');typing.className='rkc-typing';typing.innerHTML='<i></i><i></i><i></i>';body.appendChild(typing);body.scrollTop=1e9}}
+      else if(n.classList.contains('bot')){if(typing){typing.remove();typing=null}typeOut(n)}})})}).observe(body,{childList:true});
+    new MutationObserver(function(){if(p.classList.contains('show')){var r=document.createElement('div');r.className='rkc-rune';
+      r.innerHTML='<svg viewBox="0 0 100 100" fill="none" stroke="#A855F7" stroke-width="1.4"><circle cx="50" cy="50" r="46" stroke-dasharray="4 3"/><circle cx="50" cy="50" r="34"/><polygon points="50,18 78,66 22,66"/><polygon points="50,82 22,34 78,34"/><circle cx="50" cy="50" r="7" fill="#C084FC"/></svg>';
+      p.appendChild(r);setTimeout(function(){r.remove()},1800);
+      var f=document.querySelector('.chat-fab');if(f){var b=f.getBoundingClientRect(),right=b.left>innerWidth/2;p.style.left=right?'auto':'26px';p.style.right=right?(innerWidth-b.right)+'px':'auto';p.style.transformOrigin=right?'bottom right':'bottom left';p.style.bottom=(innerHeight-b.top+12)+'px'}}}).observe(p,{attributes:true,attributeFilter:['class']});
+  }
+  function scan(){document.querySelectorAll('.chat-fab').forEach(dress);var p=document.getElementById('rkChat');if(p)dressPanel(p)}
+  new MutationObserver(scan).observe(document.body,{childList:true});scan();
+})();
 </script>
 </body>
 </html>
