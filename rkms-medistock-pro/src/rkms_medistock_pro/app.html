@@ -1282,6 +1282,14 @@ select.login-input option{color:#0B1F5C;background:#fff}
 .usr-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .usr-act select{padding:5px 8px;border-radius:8px;border:1px solid var(--border2,#d6dbe6);background:var(--surface,#fff);color:inherit;font-size:12px}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&display=swap">
+<style id="rk-ptserif">
+/* PT Serif for headings only; body, tables, forms stay Inter */
+html body .login-title,html body .reg-title,html body .page-header h1,html body .modal-title,
+html body .sidebar-brand-name,html body .mcard-title,html body .topbar-title{font-family:'PT Serif',Georgia,'Times New Roman',serif!important;letter-spacing:0!important}
+html body .login-title,html body .page-header h1{font-weight:700!important}
+</style>
 </head>
 <body>
 
@@ -1307,7 +1315,7 @@ select.login-input option{color:#0B1F5C;background:#fff}
     <input class="login-input" type="password" id="lp" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="lerr"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">error</span> Wrong username or password!</div>
     <button class="login-btn" onclick="doLogin()"><span class="material-icons-round" style="font-size:18px">lock</span> Login to RKMS</button>
-    <div class="login-switch">New faculty / staff? <a onclick="rkShowRegister()">Register here</a></div>
+    <div class="login-switch">Staff / Medical Ward? <a onclick="rkShowRegister()">Register here</a></div>
     </div>
     <div id="regForm" style="display:none">
       <div class="reg-title">Staff Registration</div>
@@ -1316,6 +1324,7 @@ select.login-input option{color:#0B1F5C;background:#fff}
       <input class="login-input" type="text" id="rg-user" placeholder="Choose a username *" autocomplete="off" autocapitalize="none" spellcheck="false">
       <input class="login-input" type="email" id="rg-email" placeholder="Email (optional)" autocomplete="off">
       <select class="login-input" id="rg-role">
+        <option value="">Staff / Medical Ward — select</option>
         <option value="doctor">Staff Console</option>
         <option value="nurse">Medical Ward Console</option>
       </select>
@@ -5373,6 +5382,7 @@ window.rkRegister=async function(){
   function fail(m){err.textContent=m; err.style.display='block';}
   var name=rgVal('rg-name'), user=rgVal('rg-user'), p1=$id('rg-pass').value, p2=$id('rg-pass2').value;
   if(!name||!user||!p1){fail('Name, Username and Password are required');return;}
+  if(!$id('rg-role').value){fail('Select Staff or Medical Ward');return;}
   if(p1.length<6){fail('Password must be at least 6 characters');return;}
   if(p1!==p2){fail('Passwords do not match');return;}
   btn.disabled=true;
